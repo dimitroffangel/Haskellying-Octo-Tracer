@@ -33,7 +33,7 @@ splitOn (head : rest) symbol currentString result
     | otherwise = splitOn rest symbol (head : currentString) result
 
 convertRgbToString (Vector red green blue) = 
-    show (floor red) ++ " " ++ show (floor green) ++ " " ++ show (floor blue) ++ "\n"
+    show (floor (255.999 * red)) ++ " " ++ show (floor (255.999 * green)) ++ " " ++ show (floor (255.999 * blue)) ++ "\n"
 
 saveImage (Image imageWidth imageHeight imageContent) filePath = writeFile 
         -- convert each Rgb object to string, in the newly formed array of array of string, concat the arrays in one array of string
