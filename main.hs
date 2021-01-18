@@ -4,11 +4,7 @@ import Data.Word
 import System.IO  
 import Data.Char (intToDigit, isDigit, digitToInt)
 
-data Rgb = Rgb {    red:: Word8, 
-                    green :: Word8, 
-                    blue  :: Word8 
-                } deriving (Show,Read, Eq)
-
+import Vector
 
 data Image = Image { width   :: Int,
                     height  :: Int,
