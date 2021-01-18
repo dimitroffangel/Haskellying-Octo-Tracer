@@ -1,5 +1,7 @@
 module Ray where
 
+import Data.Word
+
 import Vector
 
 
