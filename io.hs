@@ -1,5 +1,8 @@
 module IO where
 
+import System.IO  
+import Data.Char (intToDigit, isDigit, digitToInt)
+
 import Vector
 
 data Image = Image { width   :: Int,
@@ -20,14 +23,23 @@ convertIntToString number =
             | number == 0 = result
             | otherwise = convertIntToStringHelper (number `div` 10) (intToDigit (number `mod` 10) : result)  
 
-convertRgbToString (Rgb red green blue) = 
-    convertIntToString (fromIntegral red) ++ " " ++
-    convertIntToString (fromIntegral green) ++ " " ++ convertIntToString (fromIntegral blue) ++ "\n"
+
+stringToDouble [] result = reverse result
+stringToDouble (x:xs) result = stringToDouble xs $ (read x :: Double) : result
+
+splitOn [] symbol currentString result = filter (/= "") $ reverse $ reverse currentString : result
+splitOn (head : rest) symbol currentString result 
+    | head == symbol = splitOn rest symbol "" (reverse currentString : result)
+    | otherwise = splitOn rest symbol (head : currentString) result
+
+convertRgbToString (Vector red green blue) = 
+    show (floor red) ++ " " ++ show (floor green) ++ " " ++ show (floor blue) ++ "\n"
 
 saveImage (Image imageWidth imageHeight imageContent) filePath = writeFile 
         -- convert each Rgb object to string, in the newly formed array of array of string, concat the arrays in one array of string
         filePath $ "P3\n" ++ show imageWidth ++ " " ++ show imageHeight ++ "\n255\n" ++ concat (concatMap (map convertRgbToString) imageContent)
 
+convertStringToImage :: [Char] -> Int -> Bool -> [Int] -> [Int]
 convertStringToImage [] currentNumber True result = reverse $ currentNumber : result
 convertStringToImage [] _ False result = reverse result
 convertStringToImage (head : rest) currentNumber isReadingNumber result
@@ -37,7 +49,7 @@ convertStringToImage (head : rest) currentNumber isReadingNumber result
     | isDigit head  = convertStringToImage rest (currentNumber * 10 + digitToInt head) True result
     | otherwise = convertStringToImage rest 0 False result
 
--- if it does not read the format will return the data for emptyImage
+-- -- if it does not read the format will return the data for emptyImage
 readFormat [] _ _ = "0 0 255"
 readFormat stringInput [] _ = stringInput 
 readFormat (headInput : restOfInput) format@(headFormat : restOfFormat) isReadingFormat
@@ -51,15 +63,15 @@ loadImage filePath = do
     handle <- openFile filePath ReadMode  
     string <- hGetContents handle
     let 
-        integers = convertStringToImage (readFormat (readFormat string expectedFileFormat False) "\n" False) 0 False []
+        integers = stringToDouble (splitOn (readFormat (readFormat string expectedFileFormat False) "\n" False) ' ' "" []) []
         width = head integers
         height = head . tail $ integers
         -- create the Rgb objects from the integers in one array -> split the array on height number of arrays each with length width
         -- create the final image from width height and the newly formed content from
-        in return $ Image width height $ splitListOnLists width $ bindPixels (drop 3 integers) []
+        in return $ Image (floor width) (floor height) $ splitListOnLists (floor width) $ bindPixels (drop 3 integers) []
 
-bindPixels :: [Int] -> [Rgb] -> [Rgb]
+bindPixels :: [Double] -> [Rgb] -> [Rgb]
 bindPixels [] result = reverse result
 bindPixels (red : green : blue : tail) result = bindPixels tail 
-    (Rgb (fromIntegral red::Word8) (fromIntegral green::Word8) (fromIntegral blue::Word8) : result)
+    (Vector red green blue : result)
 
