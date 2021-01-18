@@ -31,7 +31,7 @@ testingPicture currentWidth currentHeight result
         testingPicture (currentWidth + 1) currentHeight 
             $ let u = realToFrac currentWidth / realToFrac (imageWidth - 1)
                   v = realToFrac currentHeight / realToFrac (imageHeight - 1)
-                  ray = Ray originLocation (lowerLeftCorner + scalarMultiplication horizontal u + scalarMultiplication vertical v - originLocation) 
+                  ray = Ray originLocation (lowerLeftCorner + (scalarMultiplication horizontal u) + ((scalarMultiplication vertical v) - originLocation)) 
                   pixelColour = rayColour ray
                   in pixelColour : result
 
