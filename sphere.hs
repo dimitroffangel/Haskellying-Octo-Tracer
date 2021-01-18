@@ -10,7 +10,8 @@ data Sphere = Sphere {
     radius :: Double
 }
 
-hit (Sphere sphereCenter sphereRadius) ray@(Ray rayOrigin rayDirection) tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordT) = 
+hit (Sphere sphereCenter sphereRadius) ray@(Ray rayOrigin rayDirection) 
+    tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordT hitRecordFrontFace) = 
     let 
         vectorFromTheCenter = rayOrigin - sphereCenter
         a =  getSquaredVector rayDirection
@@ -27,5 +28,11 @@ hit (Sphere sphereCenter sphereRadius) ray@(Ray rayOrigin rayDirection) tMin tMa
                         then let root = (negativeB + sqrtDiscriminant) / a
                                 in if root < tMin || root > tMax 
                                     then  Left "No roots overlapping with sphere outside"
-                                    else Right $ HitRecord (getPointLocation ray hitRecordT) (scalarDivision (hitRecordPoint - sphereCenter) sphereRadius) root
-                        else Right $ HitRecord (getPointLocation ray hitRecordT) (scalarDivision (hitRecordPoint - sphereCenter) sphereRadius) root
+                                    else let getRecordAfterOutwardNormal = setFaceNormal hitRecord ray $ 
+                                                scalarDivision (hitRecordPoint - sphereCenter) sphereRadius
+                                            in Right $ HitRecord (getPointLocation ray hitRecordT) (normalVector getRecordAfterOutwardNormal) root $
+                                                    frontFace getRecordAfterOutwardNormal
+                                                 
+                        else let getRecordAfterOutwardNormal = setFaceNormal hitRecord ray $ scalarDivision (hitRecordPoint - sphereCenter) sphereRadius
+                                in Right $ HitRecord (getPointLocation ray hitRecordT) (normalVector getRecordAfterOutwardNormal) root $
+                                                    frontFace getRecordAfterOutwardNormal
