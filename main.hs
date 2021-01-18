@@ -72,3 +72,17 @@ bindPixels [] result = reverse result
 bindPixels (red : green : blue : tail) result = bindPixels tail 
     (Rgb (fromIntegral red::Word8) (fromIntegral green::Word8) (fromIntegral blue::Word8) : result)
 
+
+widthTestImage :: Int
+widthTestImage = 256
+heightTestImage :: Int
+heightTestImage = 256
+
+testingPicture currentWidth currentHeight result
+    | currentWidth == 0 && currentHeight == -1 = Image widthTestImage heightTestImage $ splitListOnLists widthTestImage result
+    | currentWidth == 0 = testingPicture (widthTestImage - 1) (currentHeight - 1) result
+    | otherwise = 
+        testingPicture (currentWidth - 1) currentHeight 
+            $ Rgb (floor (255.999 * (realToFrac currentWidth / realToFrac (widthTestImage - 1))))
+                  (floor (255.999 * (realToFrac currentHeight / realToFrac (heightTestImage - 1))))
+                  (floor (0.25 * 255.999)) : result
