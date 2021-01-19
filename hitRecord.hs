@@ -3,7 +3,7 @@ module HitRecord where
 import Ray
 import Vector
 
-data HitRecord = HitRecord {
+data HitRecord = EmptyHitRecord | HitRecord {
         point :: Vector,
         normalVector :: Vector,
         t :: Double,

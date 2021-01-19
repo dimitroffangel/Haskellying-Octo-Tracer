@@ -19,7 +19,7 @@ hit (Sphere sphereCenter sphereRadius) ray@(Ray rayOrigin rayDirection)
         c = getSquaredVector vectorFromTheCenter - sphereRadius^2
         discriminant = (halfB*halfB) - (a*c)
         in if discriminant < 0 
-            then Left "Discriminant < 0"
+            then Left hitRecordFrontFace
             else let 
                     negativeB = -halfB
                     sqrtDiscriminant = sqrt discriminant
@@ -27,7 +27,7 @@ hit (Sphere sphereCenter sphereRadius) ray@(Ray rayOrigin rayDirection)
                     in if root < tMin || root > tMax 
                         then let root = (negativeB + sqrtDiscriminant) / a
                                 in if root < tMin || root > tMax 
-                                    then  Left "No roots overlapping with sphere outside"
+                                    then Left hitRecordFrontFace
                                     else let getRecordAfterOutwardNormal = setFaceNormal hitRecord ray $ 
                                                 scalarDivision (hitRecordPoint - sphereCenter) sphereRadius
                                             in Right $ HitRecord (getPointLocation ray hitRecordT) (normalVector getRecordAfterOutwardNormal) root $
