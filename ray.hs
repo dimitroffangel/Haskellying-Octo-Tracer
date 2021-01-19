@@ -13,22 +13,6 @@ data Ray = Ray {
 getPointLocation (Ray origin direction) t = origin + scalarMultiplication direction t
 
 
--- linearly blends white and blue depending on y cooridnate of the unit vector of the ray direction
-rayColour ray@(Ray origin direction) =
-    let 
-        test = hasHitSphere (Vector 0 0 $ -1) 0.5 ray
-        in if test > 0
-            then 
-                let (Vector x y z)= getUnitVector (getPointLocation ray test + Vector 0 0 1)
-                    in scalarMultiplication (Vector (x + 1) (y + 1) (z + 1)) 0.5
-            else 
-                -- blend the value (1-t)*StartingValue + t*endValue
-                let unitDirection = getUnitVector direction
-                    newT = 0.5 * (y unitDirection + 1)
-                    in scalarMultiplication (Vector 1.0 1.0 1.0) (1 - newT) + scalarMultiplication (Vector 0.5 0.7 1) newT
-                
-
-
 -- sphere equation for point P:(x,y,z) and sphere with center C:(Cx, Cy, Cz) and radius R
 -- (x - Cx)^2 + (y - Cy)^2 + (z - Cz)^2 = R^2
 -- the vector from the center of the sphere is (P -C) . (P - C)
@@ -52,15 +36,15 @@ rayColour ray@(Ray origin direction) =
 --             then -1.0
 --             else (negativeB - sqrtDis) / quot
 
-hasHitSphere sphereCenter sphereRadius (Ray rayOrigin rayDirection) = 
-    let vectorFromTheCenter = rayOrigin - sphereCenter
-        a =  getSquaredVector rayDirection
-        halfB = dotProduct vectorFromTheCenter rayDirection
-        c = getSquaredVector vectorFromTheCenter - sphereRadius^2
-        discriminant = (halfB*halfB) - (a*c)
-        negativeB = -halfB
-        sqrtDis = sqrt discriminant
-        quot = a
-        in if discriminant < 0 
-            then -1.0
-            else (negativeB - sqrtDis) / quot
+-- hasHitSphere sphereCenter sphereRadius (Ray rayOrigin rayDirection) = 
+--     let vectorFromTheCenter = rayOrigin - sphereCenter
+--         a =  getSquaredVector rayDirection
+--         halfB = dotProduct vectorFromTheCenter rayDirection
+--         c = getSquaredVector vectorFromTheCenter - sphereRadius^2
+--         discriminant = (halfB*halfB) - (a*c)
+--         negativeB = -halfB
+--         sqrtDis = sqrt discriminant
+--         quot = a
+--         in if discriminant < 0 
+--             then -1.0
+--             else (negativeB - sqrtDis) / quot

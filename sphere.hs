@@ -10,29 +10,40 @@ data Sphere = Sphere {
     radius :: Double
 }
 
+
+-- sphere equation for point P:(x,y,z) and sphere with center C:(Cx, Cy, Cz) and radius R
+-- (x - Cx)^2 + (y - Cy)^2 + (z - Cz)^2 = R^2
+-- the vector from the center of the sphere is (P -C) . (P - C)
+-- hence (P - C)(P - C) = (x - Cx)^2 + (y - Cy)^2 + (z - Cz)^2 = R^2
+-- and with the ray data for P:
+-- (P(t) - C)(P(t) - C) = R^2
+-- (origin + t*direction - C)(origin + t*direction - C) = R^2
+-- t^2*direction*direction + 2t*direction * (origin -C) + (origin - C)(origin - C) - R^2 = 0
+-- if has two roots - two collisions with outer sphere and so forth
 hit (Sphere sphereCenter sphereRadius) ray@(Ray rayOrigin rayDirection) 
     tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordT hitRecordFrontFace) = 
     let 
         vectorFromTheCenter = rayOrigin - sphereCenter
         a =  getSquaredVector rayDirection
         halfB = dotProduct vectorFromTheCenter rayDirection
-        c = getSquaredVector vectorFromTheCenter - sphereRadius^2
+        c = getSquaredVector vectorFromTheCenter - (sphereRadius * sphereRadius)
         discriminant = (halfB*halfB) - (a*c)
         in if discriminant < 0 
-            then Left hitRecordFrontFace
+            then Left hitRecord
             else let 
-                    negativeB = -halfB
                     sqrtDiscriminant = sqrt discriminant
-                    root = (negativeB - sqrtDiscriminant) / a
-                    in if root < tMin || root > tMax 
-                        then let root = (negativeB + sqrtDiscriminant) / a
-                                in if root < tMin || root > tMax 
-                                    then Left hitRecordFrontFace
-                                    else let getRecordAfterOutwardNormal = setFaceNormal hitRecord ray $ 
-                                                scalarDivision (hitRecordPoint - sphereCenter) sphereRadius
-                                            in Right $ HitRecord (getPointLocation ray hitRecordT) (normalVector getRecordAfterOutwardNormal) root $
-                                                    frontFace getRecordAfterOutwardNormal
-                                                 
-                        else let getRecordAfterOutwardNormal = setFaceNormal hitRecord ray $ scalarDivision (hitRecordPoint - sphereCenter) sphereRadius
-                                in Right $ HitRecord (getPointLocation ray hitRecordT) (normalVector getRecordAfterOutwardNormal) root $
-                                                    frontFace getRecordAfterOutwardNormal
+                    firstRoot = (-halfB - sqrtDiscriminant) / a
+                    in if firstRoot < tMin || firstRoot > tMax 
+                        then let secondRoot = (-halfB + sqrtDiscriminant) / a
+                                in if secondRoot < tMin || secondRoot > tMax 
+                                    then Left hitRecord
+                                    else let 
+                                            newT = secondRoot
+                                            newPoint = (getPointLocation ray newT)
+                                            in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal newT hitRecordFrontFace) ray $ 
+                                                scalarDivision (newPoint - sphereCenter) sphereRadius
+                        else let 
+                                newT = firstRoot
+                                newPoint = (getPointLocation ray newT)
+                                in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal newT hitRecordFrontFace) ray $ 
+                                    scalarDivision (newPoint - sphereCenter) sphereRadius
