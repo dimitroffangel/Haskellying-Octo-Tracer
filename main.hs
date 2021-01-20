@@ -14,15 +14,21 @@ import UtilityFunctions
 infinity = 1.79769e+308
 
 world = [
-        Sphere (Vector 0 0 (-1)) 0.5,
-        Sphere (Vector 0 (-100.5) (-1)) 100
+        Sphere (Vector 0.0 (-100.5) (-1)) 100 (LambertianMaterial $ Vector 0.8 0.8 0),
+        Sphere (Vector 0.0 0.0 (-1.0)) 0.5 (LambertianMaterial $ Vector 0.7 0.3 0.3),
+        Sphere (Vector (-1) 0 (-1)) 0.5 (Metal $ Vector 0.8 0.8 0.8),    
+        Sphere (Vector 1 0 (-1)) 0.5 (Metal $ Vector 0.8 0.6 0.2) 
     ]
 
 mainCamera = Camera originLocation lowerLeftCorner horizontal vertical
 
 maxDepth = 50
 
-wrapInIO :: Monad m => a -> m a
+transformEitherToIO :: Either a a -> IO a
+transformEitherToIO (Right a) = return a
+transformEitherToIO (Left a) = return a
+
+wrapInIO :: a -> IO a
 wrapInIO = return
 
 -- linearly blends white and blue depending on y cooridnate of the unit vector of the ray direction
@@ -40,8 +46,13 @@ rayColour ray@(Ray origin direction) worldObjects depth =
                     -- where fi is the angle between the normal of the sphere and the point
                     -- get a random point in the sphere and normalize it to be on the sphere
                     unitSphereVector <- getUnitVectorInUnitSphere
-                    getNewRayColour <- rayColour (Ray (point hit) ((point hit) + (normalVector hit) + unitSphereVector)) worldObjects $ depth - 1
-                    return $ scalarMultiplication getNewRayColour 0.5  
+                    getNewRay <- 
+                        let scatteredRay = getScatteredRay (hitRecordMaterial hit) hit ray unitSphereVector
+                            in case scatteredRay of
+                                (Left _) -> return $ Vector 0 0 0
+                                (Right finalResult) -> (rayColour finalResult worldObjects $ depth - 1)
+                    return $ getNewRay * (colour $ hitRecordMaterial hit)  
+
             (Left _) -> 
                 let (Vector _ y _) = getUnitVector direction
                     t = 0.5 * (y + 1)

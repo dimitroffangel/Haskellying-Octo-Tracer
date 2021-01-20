@@ -6,8 +6,9 @@ import HitRecord
 import Vector
 
 data Sphere = Sphere {
-    center :: Vector,
-    radius :: Double
+    sphereCenter :: Vector,
+    sphereRadius :: Double,
+    sphereMaterial :: Material
 }
 
 
@@ -20,8 +21,8 @@ data Sphere = Sphere {
 -- (origin + t*direction - C)(origin + t*direction - C) = R^2
 -- t^2*direction*direction + 2t*direction * (origin -C) + (origin - C)(origin - C) - R^2 = 0
 -- if has two roots - two collisions with outer sphere and so forth
-hit (Sphere sphereCenter sphereRadius) ray@(Ray rayOrigin rayDirection) 
-    tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordT hitRecordFrontFace) = 
+hit (Sphere sphereCenter sphereRadius sphereMaterial) ray@(Ray rayOrigin rayDirection) 
+    tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordMaterial hitRecordT hitRecordFrontFace) = 
     let 
         vectorFromTheCenter = rayOrigin - sphereCenter
         a =  getSquaredVector rayDirection
@@ -40,10 +41,10 @@ hit (Sphere sphereCenter sphereRadius) ray@(Ray rayOrigin rayDirection)
                                     else let 
                                             newT = secondRoot
                                             newPoint = (getPointLocation ray newT)
-                                            in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal newT hitRecordFrontFace) ray $ 
+                                            in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
                                                 scalarDivision (newPoint - sphereCenter) sphereRadius
                         else let 
                                 newT = firstRoot
                                 newPoint = (getPointLocation ray newT)
-                                in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal newT hitRecordFrontFace) ray $ 
+                                in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
                                     scalarDivision (newPoint - sphereCenter) sphereRadius

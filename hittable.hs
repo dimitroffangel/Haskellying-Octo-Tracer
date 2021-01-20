@@ -10,7 +10,7 @@ import Sphere
 
 clear hittableList = []
 
-hitList hittableList ray@(Ray rayOrigin rayDirection) tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordT hitRecordFrontFace) =
+hitList hittableList ray@(Ray rayOrigin rayDirection) tMin tMax hitRecord =
     hitHelper hittableList tMax hitRecord False
         where 
             hitHelper [] _ tempRecord True = Right tempRecord 

@@ -56,6 +56,7 @@ epsilon = 1e-8
 
 isVectorNearZero (Vector x y z) = x < epsilon && y < epsilon && z < epsilon 
 
+reflect :: Vector -> Vector -> Vector
 reflect incomingRay normalVector = incomingRay - (scalarMultiplication normalVector $ 2 * dotProduct incomingRay normalVector)
 
 type Rgb = Vector
