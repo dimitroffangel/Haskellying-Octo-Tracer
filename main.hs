@@ -16,8 +16,8 @@ infinity = 1.79769e+308
 world = [
         Sphere (Vector 0.0 (-100.5) (-1)) 100 (LambertianMaterial $ Vector 0.8 0.8 0),
         Sphere (Vector 0.0 0.0 (-1.0)) 0.5 (LambertianMaterial $ Vector 0.7 0.3 0.3),
-        Sphere (Vector (-1) 0 (-1)) 0.5 (Metal $ Vector 0.8 0.8 0.8),    
-        Sphere (Vector 1 0 (-1)) 0.5 (Metal $ Vector 0.8 0.6 0.2) 
+        Sphere (Vector (-1) 0 (-1)) 0.5 (Metal (Vector 0.8 0.8 0.8) 0.3),    
+        Sphere (Vector 1 0 (-1)) 0.5 (Metal (Vector 0.8 0.6 0.2) 1) 
     ]
 
 mainCamera = Camera originLocation lowerLeftCorner horizontal vertical

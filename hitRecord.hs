@@ -3,11 +3,18 @@ module HitRecord where
 import Ray
 import Vector
 
+
+clampFuzziness :: Double -> Double
+clampFuzziness a 
+    | a < 1 = a
+    | otherwise = 1
+
 data Material = LambertianMaterial {
         colour :: Vector
     }
     | Metal {
-        colour :: Vector
+        colour :: Vector,
+        fuzziness :: Double
     }
     | Void
 
@@ -34,11 +41,12 @@ getScatteredRay lambMaterial@(LambertianMaterial _) hit incomingRay@(Ray origin 
     | isVectorNearZero unitSphereVector = getScatteredRay lambMaterial hit incomingRay $ Vector 0 0 0 
     | otherwise = Right $ Ray (point hit) $ normalVector hit + unitSphereVector
 
-getScatteredRay (Metal colour) hit ray@(Ray origin direction) unitSphereVector = 
-    let result@(Ray resultOrigin resultDirection)= Ray (point hit) $ reflect (getUnitVector direction) (normalVector hit)
+getScatteredRay (Metal colour fuzziness) hit ray@(Ray origin direction) unitSphereVector = 
+    let result@(Ray resultOrigin resultDirection)= Ray (point hit) $ (reflect (getUnitVector direction) (normalVector hit)) + 
+                scalarMultiplication unitSphereVector fuzziness 
         in if (dotProduct resultDirection (normalVector hit)) > 0
             then Right result
             else Left result
 
 gelColourAfterRay (LambertianMaterial colour) _ = colour  
-gelColourAfterRay (Metal colour)  _ = colour  
+gelColourAfterRay (Metal colour _)  _ = colour  
