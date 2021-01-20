@@ -34,10 +34,12 @@ splitOn (head : rest) symbol currentString result
     | head == symbol = splitOn rest symbol "" (reverse currentString : result)
     | otherwise = splitOn rest symbol (head : currentString) result
 
-convertRgbToString (Vector red green blue) = 
-    show (floor (256* clamp (red * (1 / realToFrac samplePerPixel)) 0.0 0.999)) ++ " " ++ 
-    show (floor (256* clamp (green * (1 / realToFrac samplePerPixel)) 0.0 0.999)) ++ " " ++ 
-    show (floor (256* clamp (blue * (1 / realToFrac samplePerPixel)) 0.0 0.999)) ++ "\n"
+convertRgbToString (Vector red green blue) =
+    let scaleColour =  (1 / realToFrac samplePerPixel)
+    in
+        show (floor (256* clamp (sqrt (red * scaleColour)) 0.0 0.999)) ++ " " ++ 
+        show (floor (256* clamp (sqrt (green * scaleColour)) 0.0 0.999)) ++ " " ++ 
+        show (floor (256* clamp (sqrt (blue * scaleColour)) 0.0 0.999)) ++ "\n"
 
 saveImage ioImage filePath = 
         -- convert each Rgb object to string, in the newly formed array of array of string, concat the arrays in one array of string
