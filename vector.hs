@@ -50,4 +50,6 @@ getRandomVectorInUnitSphere =
             else return $ Vector x y (1 - (x^2 + y^2)) 
         
 
+getUnitVectorInUnitSphere = getRandomVectorInUnitSphere
+
 type Rgb = Vector

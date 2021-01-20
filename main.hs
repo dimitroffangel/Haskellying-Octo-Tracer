@@ -32,7 +32,11 @@ rayColour ray@(Ray origin direction) worldObjects depth =
         in case hitResult of 
             (Right hit) -> 
                 do 
-                    unitSphereVector <- getRandomVectorInUnitSphere
+                    -- using Lambertian reflection (hence all light is reflected equally in all directions), 
+                    -- where there is a higher probability for rays that close to the normal with a more uniform distrubution cosfi,
+                    -- where fi is the angle between the normal of the sphere and the point
+                    -- get a random point in the sphere and normalize it to be on the sphere
+                    unitSphereVector <- getUnitVectorInUnitSphere
                     getNewRayColour <- rayColour (Ray (point hit) ((point hit) + (normalVector hit) + unitSphereVector)) worldObjects $ depth - 1
                     return $ scalarMultiplication getNewRayColour 0.5  
             (Left _) -> 
