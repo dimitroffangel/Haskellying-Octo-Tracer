@@ -7,13 +7,13 @@ import HitRecord
 import Sphere
 import Hittable
 
+import GeneratingRandomStuff
+
 
 -- image info
 aspectRatio = 16.0 / 9.0
 imageWidth = 400
 imageHeight = floor $ realToFrac imageWidth / aspectRatio
-
-
 
 -- use of Right hand coordiante system
 -- camera stuff
