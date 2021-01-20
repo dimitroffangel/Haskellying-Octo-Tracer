@@ -35,6 +35,7 @@ splitOn (head : rest) symbol currentString result
     | otherwise = splitOn rest symbol (head : currentString) result
 
 convertRgbToString (Vector red green blue) =
+    -- for better colouring
     let scaleColour =  (1 / realToFrac samplePerPixel)
     in
         show (floor (256* clamp (sqrt (red * scaleColour)) 0.0 0.999)) ++ " " ++ 
