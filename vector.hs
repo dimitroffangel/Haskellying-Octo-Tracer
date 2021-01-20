@@ -59,4 +59,10 @@ isVectorNearZero (Vector x y z) = x < epsilon && y < epsilon && z < epsilon
 reflect :: Vector -> Vector -> Vector
 reflect incomingRay normalVector = incomingRay - (scalarMultiplication normalVector $ 2 * dotProduct incomingRay normalVector)
 
+refract uv  normal etaOverEtaPrim =
+    let cosTheta = min (dotProduct (-uv) normal) 1
+        refractedRayPerpendicular = scalarMultiplication (uv + scalarMultiplication n cosTheta) etaOverEtaPrim
+        refractedRayParallel = scalarMultiplication normal $ -sqrt(abs $ 1 - getSquaredVector refractedRayPerpendicular)  
+        in refractedRayPerpendicular + refractedRayParallel 
+
 type Rgb = Vector
