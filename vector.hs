@@ -52,4 +52,8 @@ getRandomVectorInUnitSphere =
 
 getUnitVectorInUnitSphere = getRandomVectorInUnitSphere
 
+epsilon = 1e-8
+
+isVectorNearZero (Vector x y z) = x < epsilon && y < epsilon && z < epsilon 
+
 type Rgb = Vector
