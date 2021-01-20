@@ -22,6 +22,9 @@ mainCamera = Camera originLocation lowerLeftCorner horizontal vertical
 
 maxDepth = 50
 
+wrapInIO :: Monad m => a -> m a
+wrapInIO = return
+
 -- linearly blends white and blue depending on y cooridnate of the unit vector of the ray direction
 rayColour ray@(Ray origin direction) worldObjects 0 = 
     do 
