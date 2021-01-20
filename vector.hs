@@ -2,6 +2,8 @@ module Vector where
 
 import Data.Word
 
+import GeneratingRandomStuff
+
 data Vector = Vector {
     x :: Double,
     y :: Double,
@@ -31,5 +33,21 @@ getUnitVector vector = scalarDivision vector $ getVectorLength vector
 dotProduct (Vector x1 y1 z1) (Vector x2 y2 z2) = x1 * x2 + y1*y2 + z1*z2
 
 crossProduct (Vector x1 y1 z1) (Vector x2 y2 z2) = Vector (y1 * z2 - z1*y2) (z1*x2 - z2*x1) (x1*y2 - y1*x2) 
+
+getRandomVectorInInterval min max =
+    do 
+        x <- generateNumberInInterval min max
+        y <- generateNumberInInterval min max
+        z <- generateNumberInInterval min max
+        return $ Vector x y z
+
+getRandomVectorInUnitSphere =
+    do 
+        x <- generateNumberInInterval (-1) 1
+        y <- generateNumberInInterval (-1) 1
+        if x^2 + y^2 > 1
+            then getRandomVectorInUnitSphere
+            else return $ Vector x y (1 - (x^2 + y^2)) 
+        
 
 type Rgb = Vector

@@ -11,7 +11,7 @@ imageWidth :: Int
 imageWidth = 400
 imageHeight :: Int
 imageHeight = floor $ realToFrac imageWidth / aspectRatio
-samplePerPixel = 20                    
+samplePerPixel = 10           
 
 -- use of Right hand coordiante system
 -- camera stuff

@@ -20,15 +20,28 @@ world = [
 
 mainCamera = Camera originLocation lowerLeftCorner horizontal vertical
 
+maxDepth = 50
+
 -- linearly blends white and blue depending on y cooridnate of the unit vector of the ray direction
-rayColour ray@(Ray origin direction) worldObjects =
-    let hitResult = hitList worldObjects ray 0 infinity emptyHitRecord
+rayColour ray@(Ray origin direction) worldObjects 0 = 
+    do 
+        foo <- generateNumberInInterval 0 0
+        return $ Vector 0 0 0
+rayColour ray@(Ray origin direction) worldObjects depth =
+    let hitResult = hitList worldObjects ray 0.001 infinity emptyHitRecord
         in case hitResult of 
-            (Right hit) -> scalarMultiplication ((normalVector hit) + Vector 1 1 1) 0.5
+            (Right hit) -> 
+                do 
+                    unitSphereVector <- getRandomVectorInUnitSphere
+                    getNewRayColour <- rayColour (Ray (point hit) ((point hit) + (normalVector hit) + unitSphereVector)) worldObjects $ depth - 1
+                    return $ scalarMultiplication getNewRayColour 0.5  
             (Left _) -> 
                 let (Vector _ y _) = getUnitVector direction
-                    t' = 0.5 * (y + 1)
-                in (scalarMultiplication (Vector 1.0 1.0 1.0) (1 - t')) + (scalarMultiplication (Vector 0.5 0.7 1) t')
+                    t = 0.5 * (y + 1)
+                in 
+                    do 
+                        foo <- generateNumberInInterval 0 0
+                        return $ (scalarMultiplication (Vector 1.0 1.0 1.0) (1 - t)) + (scalarMultiplication (Vector 0.5 0.7 1) t)
 
 
 shadePixel 0 _ _ resultedColour = 
@@ -39,11 +52,13 @@ shadePixel index width height resultedColour =
     do
         randomGeneratedValueU <- generateNumberInInterval 0 1
         randomGeneratedValueV <- generateNumberInInterval 0 1
-        let 
-            u =  ((realToFrac width) + randomGeneratedValueU) / realToFrac (imageWidth - 1)
-            v = ((realToFrac height) + randomGeneratedValueV) / realToFrac (imageHeight - 1)
-            ray = getRay u v mainCamera 
-            in shadePixel (index - 1) width height (resultedColour + rayColour ray world)
+        unwrappedColour <- 
+            let 
+                u =  ((realToFrac width) + randomGeneratedValueU) / realToFrac (imageWidth - 1)
+                v = ((realToFrac height) + randomGeneratedValueV) / realToFrac (imageHeight - 1)
+                ray = getRay u v mainCamera 
+                in (rayColour ray world maxDepth)
+        shadePixel (index - 1) width height (resultedColour + unwrappedColour) 
 
 testingPicture currentWidth currentHeight result
     | currentWidth == imageWidth && currentHeight == 0 = 
