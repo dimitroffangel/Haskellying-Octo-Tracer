@@ -15,9 +15,9 @@ infinity = 1.79769e+308
 
 world = [
         Sphere (Vector 0.0 (-100.5) (-1)) 100 (LambertianMaterial $ Vector 0.8 0.8 0),
-        Sphere (Vector 0.0 0.0 (-1.0)) 0.5 (LambertianMaterial $ Vector 0.7 0.3 0.3),
-        Sphere (Vector (-1) 0 (-1)) 0.5 (Metal (Vector 0.8 0.8 0.8) $ clampFuzziness 0.3),    
-        Sphere (Vector 1 0 (-1)) 0.5 (Metal (Vector 0.8 0.6 0.2) $ clampFuzziness 1) 
+        Sphere (Vector 0.0 0.0 (-1.0)) 0.5 (LambertianMaterial $ Vector 0.1 0.2 0.5),
+        Sphere (Vector (-1) 0 (-1)) 0.5 (Dielectric 1.5),    
+        Sphere (Vector 1 0 (-1)) 0.5 (Metal (Vector 0.8 0.6 0.2) $ clampFuzziness 0) 
     ]
 
 mainCamera = Camera originLocation lowerLeftCorner horizontal vertical
@@ -51,7 +51,7 @@ rayColour ray@(Ray origin direction) worldObjects depth =
                             in case scatteredRay of
                                 (Left _) -> return $ Vector 0 0 0
                                 (Right finalResult) -> (rayColour finalResult worldObjects $ depth - 1)
-                    return $ getNewRay * (colour $ hitRecordMaterial hit)  
+                    return $ getNewRay * (getColourAfterRay $ hitRecordMaterial hit)  
 
             (Left _) -> 
                 let (Vector _ y _) = getUnitVector direction

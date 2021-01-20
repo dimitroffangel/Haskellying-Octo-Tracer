@@ -61,7 +61,7 @@ reflect incomingRay normalVector = incomingRay - (scalarMultiplication normalVec
 
 refract uv  normal etaOverEtaPrim =
     let cosTheta = min (dotProduct (-uv) normal) 1
-        refractedRayPerpendicular = scalarMultiplication (uv + scalarMultiplication n cosTheta) etaOverEtaPrim
+        refractedRayPerpendicular = scalarMultiplication (uv + scalarMultiplication normal cosTheta) etaOverEtaPrim
         refractedRayParallel = scalarMultiplication normal $ -sqrt(abs $ 1 - getSquaredVector refractedRayPerpendicular)  
         in refractedRayPerpendicular + refractedRayParallel 
 

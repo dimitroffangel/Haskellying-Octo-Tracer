@@ -16,6 +16,9 @@ data Material = LambertianMaterial {
         colour :: Vector,
         fuzziness :: Double
     }
+    | Dielectric{
+        indexOfRefraction :: Double
+    }
     | Void
 
 
@@ -41,12 +44,26 @@ getScatteredRay lambMaterial@(LambertianMaterial _) hit incomingRay@(Ray origin 
     | isVectorNearZero unitSphereVector = getScatteredRay lambMaterial hit incomingRay $ Vector 0 0 0 
     | otherwise = Right $ Ray (point hit) $ normalVector hit + unitSphereVector
 
-getScatteredRay (Metal colour fuzziness) hit ray@(Ray origin direction) unitSphereVector = 
+getScatteredRay (Metal colour fuzziness) hit incomingRay@(Ray origin direction) unitSphereVector = 
     let result@(Ray resultOrigin resultDirection)= Ray (point hit) $ (reflect (getUnitVector direction) (normalVector hit)) + 
                 scalarMultiplication unitSphereVector fuzziness 
         in if (dotProduct resultDirection (normalVector hit)) > 0
             then Right result
             else Left result
 
-gelColourAfterRay (LambertianMaterial colour) _ = colour  
-gelColourAfterRay (Metal colour _)  _ = colour  
+getScatteredRay (Dielectric indexOfRefraction) hit incomingRay@(Ray origin direction) unitSphereVector = 
+    if frontFace hit 
+        then refractReflectRay $ 1 / indexOfRefraction
+        else refractReflectRay indexOfRefraction 
+        where
+            unitDirection = getUnitVector direction
+            cosTheta = min (dotProduct (-unitDirection) $ normalVector hit) 1
+            sinTheta = sqrt (1 - cosTheta * cosTheta) 
+            refractReflectRay refractionRatio 
+            -- cannot refract because the sin of theta' gets above 1, so reflect 
+                | refractionRatio * sinTheta > 1 = Right $ Ray (point hit) $ reflect unitDirection $ normalVector hit
+                | otherwise = Right $ Ray (point hit) $ refract unitDirection (normalVector hit) refractionRatio
+
+getColourAfterRay (LambertianMaterial colour) = colour  
+getColourAfterRay (Metal colour _) = colour  
+getColourAfterRay (Dielectric _) = Vector 1 1 1
