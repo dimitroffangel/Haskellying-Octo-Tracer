@@ -4,6 +4,8 @@ import System.IO
 import Data.Char (intToDigit, isDigit, digitToInt)
 
 import Vector
+import UtilityFunctions
+import Camera
 
 data Image = Image { width   :: Int,
                     height  :: Int,
@@ -33,11 +35,15 @@ splitOn (head : rest) symbol currentString result
     | otherwise = splitOn rest symbol (head : currentString) result
 
 convertRgbToString (Vector red green blue) = 
-    show (floor (255.999 * red)) ++ " " ++ show (floor (255.999 * green)) ++ " " ++ show (floor (255.999 * blue)) ++ "\n"
+    show (floor (256* clamp (red * (1 / realToFrac samplePerPixel)) 0.0 0.999)) ++ " " ++ 
+    show (floor (256* clamp (green * (1 / realToFrac samplePerPixel)) 0.0 0.999)) ++ " " ++ 
+    show (floor (256* clamp (blue * (1 / realToFrac samplePerPixel)) 0.0 0.999)) ++ "\n"
 
-saveImage (Image imageWidth imageHeight imageContent) filePath = writeFile 
+saveImage ioImage filePath = 
         -- convert each Rgb object to string, in the newly formed array of array of string, concat the arrays in one array of string
-        filePath $ "P3\n" ++ show imageWidth ++ " " ++ show imageHeight ++ "\n255\n" ++ concat (concatMap (map convertRgbToString) imageContent)
+        do
+            (Image imageWidth imageHeight imageContent) <- ioImage
+            writeFile filePath $ "P3\n" ++ show imageWidth ++ " " ++ show imageHeight ++ "\n255\n" ++ concat (concatMap (map convertRgbToString) imageContent)
 
 convertStringToImage :: [Char] -> Int -> Bool -> [Int] -> [Int]
 convertStringToImage [] currentNumber True result = reverse $ currentNumber : result

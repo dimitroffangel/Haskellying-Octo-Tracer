@@ -4,10 +4,14 @@ import Vector
 
 import Ray
 
+
 -- image info
 aspectRatio = 16.0 / 9.0
+imageWidth :: Int
 imageWidth = 400
+imageHeight :: Int
 imageHeight = floor $ realToFrac imageWidth / aspectRatio
+samplePerPixel = 20                    
 
 -- use of Right hand coordiante system
 -- camera stuff
@@ -22,7 +26,8 @@ horizontal = Vector (realToFrac viewportWidth) 0 0
 vertical = Vector 0 2 0
 lowerLeftCorner = originLocation - scalarDivision horizontal 2 - scalarDivision vertical 2 - Vector 0 0 focalLength
 
-getRay u v = Ray originLocation (lowerLeftCorner + scalarMultiplication horizontal u + (scalarMultiplication vertical v - originLocation)) 
+getRay u v (Camera cameraOrigin cameraLowerLeftCorner cameraHorizontal cameraVertical ) = 
+    Ray cameraOrigin (cameraLowerLeftCorner + scalarMultiplication cameraHorizontal u + (scalarMultiplication cameraVertical v - cameraOrigin)) 
 
 data Camera = Camera {
     cameraOrigin :: Vector,
