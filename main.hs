@@ -12,16 +12,13 @@ import UtilityFunctions
 
 -- constants
 infinity = 1.79769e+308
-
+demoRadius = cos (pi / 4)
 world = [
-        Sphere (Vector 0.0 (-100.5) (-1)) 100 (LambertianMaterial $ Vector 0.8 0.8 0),
-        Sphere (Vector 0.0 0.0 (-1.0)) 0.5 (LambertianMaterial $ Vector 0.1 0.2 0.5),
-        Sphere (Vector (-1) 0 (-1)) 0.5 (Dielectric 1.5),    
-        Sphere (Vector (-1) 0 (-1)) (-0.4) (Dielectric 1.5),
-        Sphere (Vector 1 0 (-1)) 0.5 (Metal (Vector 0.8 0.6 0.2) $ clampFuzziness 0) 
+        Sphere (Vector (-demoRadius) 0 (-1)) demoRadius (LambertianMaterial (Vector 0 0 1)),
+        Sphere (Vector demoRadius 0 (-1)) demoRadius (LambertianMaterial (Vector 1 0 0))
     ]
 
-mainCamera = Camera originLocation lowerLeftCorner horizontal vertical
+mainCamera = constructCamera 90 aspectRatio
 
 maxDepth = 50
 
