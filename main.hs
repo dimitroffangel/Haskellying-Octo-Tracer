@@ -17,6 +17,7 @@ world = [
         Sphere (Vector 0.0 (-100.5) (-1)) 100 (LambertianMaterial $ Vector 0.8 0.8 0),
         Sphere (Vector 0.0 0.0 (-1.0)) 0.5 (LambertianMaterial $ Vector 0.1 0.2 0.5),
         Sphere (Vector (-1) 0 (-1)) 0.5 (Dielectric 1.5),    
+        Sphere (Vector (-1) 0 (-1)) (-0.4) (Dielectric 1.5),
         Sphere (Vector 1 0 (-1)) 0.5 (Metal (Vector 0.8 0.6 0.2) $ clampFuzziness 0) 
     ]
 
@@ -46,8 +47,9 @@ rayColour ray@(Ray origin direction) worldObjects depth =
                     -- where fi is the angle between the normal of the sphere and the point
                     -- get a random point in the sphere and normalize it to be on the sphere
                     unitSphereVector <- getUnitVectorInUnitSphere
+                    randomNumber <- (generateNumberInInterval 0 1)
                     getNewRay <- 
-                        let scatteredRay = getScatteredRay (hitRecordMaterial hit) hit ray unitSphereVector
+                        let scatteredRay = getScatteredRay (hitRecordMaterial hit) hit ray unitSphereVector randomNumber
                             in case scatteredRay of
                                 (Left _) -> return $ Vector 0 0 0
                                 (Right finalResult) -> (rayColour finalResult worldObjects $ depth - 1)

@@ -2,6 +2,7 @@ module HitRecord where
 
 import Ray
 import Vector
+import GeneratingRandomStuff
 
 
 clampFuzziness :: Double -> Double
@@ -40,18 +41,18 @@ setFaceNormal (HitRecord point _ material t frontFace) (Ray origin direction) ou
 
 
 
-getScatteredRay lambMaterial@(LambertianMaterial _) hit incomingRay@(Ray origin direction) unitSphereVector
-    | isVectorNearZero unitSphereVector = getScatteredRay lambMaterial hit incomingRay $ Vector 0 0 0 
+getScatteredRay lambMaterial@(LambertianMaterial _) hit incomingRay@(Ray origin direction) unitSphereVector randomNumber
+    | isVectorNearZero unitSphereVector = getScatteredRay lambMaterial hit incomingRay (Vector 0 0 0) randomNumber
     | otherwise = Right $ Ray (point hit) $ normalVector hit + unitSphereVector
 
-getScatteredRay (Metal colour fuzziness) hit incomingRay@(Ray origin direction) unitSphereVector = 
+getScatteredRay (Metal colour fuzziness) hit incomingRay@(Ray origin direction) unitSphereVector _ = 
     let result@(Ray resultOrigin resultDirection)= Ray (point hit) $ (reflect (getUnitVector direction) (normalVector hit)) + 
                 scalarMultiplication unitSphereVector fuzziness 
         in if (dotProduct resultDirection (normalVector hit)) > 0
             then Right result
             else Left result
 
-getScatteredRay (Dielectric indexOfRefraction) hit incomingRay@(Ray origin direction) unitSphereVector = 
+getScatteredRay (Dielectric indexOfRefraction) hit incomingRay@(Ray origin direction) unitSphereVector randomNumber = 
     if frontFace hit 
         then refractReflectRay $ 1 / indexOfRefraction
         else refractReflectRay indexOfRefraction 
@@ -61,9 +62,15 @@ getScatteredRay (Dielectric indexOfRefraction) hit incomingRay@(Ray origin direc
             sinTheta = sqrt (1 - cosTheta * cosTheta) 
             refractReflectRay refractionRatio 
             -- cannot refract because the sin of theta' gets above 1, so reflect 
-                | refractionRatio * sinTheta > 1 = Right $ Ray (point hit) $ reflect unitDirection $ normalVector hit
+                | (refractionRatio * sinTheta > 1) || (reflectance cosTheta refractionRatio) > randomNumber = 
+                    Right $ Ray (point hit) $ reflect unitDirection $ normalVector hit
                 | otherwise = Right $ Ray (point hit) $ refract unitDirection (normalVector hit) refractionRatio
 
 getColourAfterRay (LambertianMaterial colour) = colour  
 getColourAfterRay (Metal colour _) = colour  
 getColourAfterRay (Dielectric _) = Vector 1 1 1
+
+reflectance cosine indexOfReflactance =
+    let r0 = (1 - indexOfReflactance) / (1 + indexOfReflactance)
+        raisedro = r0 * r0
+        in raisedro + (1-raisedro)* ((1-cosine)^5)
