@@ -26,8 +26,17 @@ world = [
         Sphere (Vector 1 0 (-1)) 0.5 (Metal (Vector 0.8 0.6 0.2) $ clampFuzziness 0) 
     ]
 
+    
+
+lookFrom = Vector 3 3 2
+lookAt = Vector 0 0 $ -1
+viewUp = Vector 0 1 0
+distToFocus = getVectorLength (lookFrom - lookAt)
+aperture = 2
+
 -- mainCamera = constructCamera 90 aspectRatio (Vector (-2) 2 1) (Vector 0 0 (-1)) (Vector 0 1 0)
-mainCamera = constructCamera 20 aspectRatio (Vector (-2) 2 1) (Vector 0 0 (-1)) (Vector 0 1 0)
+-- mainCamera = constructCamera 20 aspectRatio (Vector (-2) 2 1) (Vector 0 0 (-1)) (Vector 0 1 0)
+mainCamera = constructCamera 20 aspectRatio aperture distToFocus lookFrom lookAt viewUp
 
 
 maxDepth = 50
@@ -79,11 +88,12 @@ shadePixel index width height resultedColour =
     do
         randomGeneratedValueU <- generateNumberInInterval 0 1
         randomGeneratedValueV <- generateNumberInInterval 0 1
+        unitDiskVector <- getRandomVectorInDiskCenter
         unwrappedColour <- 
             let 
                 u =  ((realToFrac width) + randomGeneratedValueU) / realToFrac (imageWidth - 1)
                 v = ((realToFrac height) + randomGeneratedValueV) / realToFrac (imageHeight - 1)
-                ray = getRay u v mainCamera 
+                ray = getRay u v mainCamera unitDiskVector
                 in (rayColour ray world maxDepth)
         shadePixel (index - 1) width height (resultedColour + unwrappedColour) 
 

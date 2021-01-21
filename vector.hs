@@ -48,7 +48,16 @@ getRandomVectorInUnitSphere =
         if x^2 + y^2 > 1
             then getRandomVectorInUnitSphere
             else return $ Vector x y (1 - (x^2 + y^2)) 
+
+getRandomVectorInDiskCenter =
+    do 
+        x <- generateNumberInInterval (-1) 1
+        y <- generateNumberInInterval (-1) 1
+        if x^2 + y^2 > 1
+            then getRandomVectorInUnitSphere
+            else return $ Vector x y 0
         
+
 
 getUnitVectorInUnitSphere = getRandomVectorInUnitSphere
 

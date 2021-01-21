@@ -26,8 +26,12 @@ defaultHorizontal = Vector (realToFrac defaultViewportWidth) 0 0
 defaultVertical = Vector 0 2 0
 defaultLowerLeftCorner = defaultOriginLocation - scalarDivision defaultHorizontal 2 - scalarDivision defaultVertical 2 - Vector 0 0 defaultFocalLength
 
-getRay s t camera = 
-    Ray (cameraOrigin camera) $ (cameraLowerLeftCorner camera) + scalarMultiplication (cameraHorizontal camera) s + scalarMultiplication (cameraVertical camera) t - (cameraOrigin camera)
+getRay s t camera unitDiskVector = 
+    let 
+        radiusVector@(Vector xRadiusVector yRadiusVector zRadiusVector) = scalarMultiplication unitDiskVector (cameraLensRadius camera)
+        offset = scalarMultiplication (cameraRelativeU camera) xRadiusVector + scalarMultiplication (cameraRelativeV camera) yRadiusVector
+    in  Ray (cameraOrigin camera + offset) $ 
+        (cameraLowerLeftCorner camera) + scalarMultiplication (cameraHorizontal camera) s + scalarMultiplication (cameraVertical camera) t - (cameraOrigin camera) - offset
 
 data Camera = Camera {
     cameraOrigin :: Vector,
@@ -38,12 +42,13 @@ data Camera = Camera {
     cameraHeight :: Double,
     cameraViewportHeight :: Double,
     cameraViewportWidth :: Double,
-    cameraRelativeX :: Vector,
-    cameraRelativeY :: Vector,
-    cameraRelativeZ :: Vector 
+    cameraRelativeU :: Vector,
+    cameraRelativeV :: Vector,
+    cameraRelativeW :: Vector,
+    cameraLensRadius :: Double
 } deriving (Show, Read, Eq)
 
-constructCamera verticalFieldOfView aspectRatio lookFrom lookAt viewUp=
+constructCamera verticalFieldOfView aspectRatio aperture focusDist lookFrom lookAt viewUp =
     let theta = degreesToRadians verticalFieldOfView
         height = tan(theta / 2)
         viewportHeight = 2.0 * height
@@ -52,11 +57,11 @@ constructCamera verticalFieldOfView aspectRatio lookFrom lookAt viewUp=
         w = getUnitVector (lookFrom - lookAt)
         u = getUnitVector (crossProduct viewUp w)
         v = crossProduct w u
-        horizontal = scalarMultiplication u viewportWidth
-        vertical = scalarMultiplication v viewportHeight
+        horizontal = scalarMultiplication u (viewportWidth * focusDist)
+        vertical = scalarMultiplication v (viewportHeight * focusDist)
             in Camera
                 lookFrom -- origin
-                (lookFrom - scalarDivision horizontal 2 - scalarDivision vertical 2 - w) -- lowerleft
+                (lookFrom - scalarDivision horizontal 2 - scalarDivision vertical 2 - scalarMultiplication w focusDist) -- lowerleft
                 horizontal 
                 vertical
                 (degreesToRadians verticalFieldOfView) -- theta
@@ -66,3 +71,4 @@ constructCamera verticalFieldOfView aspectRatio lookFrom lookAt viewUp=
                 u
                 v
                 w
+                (aperture / 2)
