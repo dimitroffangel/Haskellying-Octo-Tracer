@@ -60,4 +60,4 @@ movingSphereMakeBoundBox movingSphere@(MovingSphere sphereCenterInitially sphere
         boxAfterMovement = AABB 
                 (moveSphere movingSphere toInterval + (Vector sphereRadius sphereRadius sphereRadius))
                 (moveSphere movingSphere toInterval + (Vector sphereRadius sphereRadius sphereRadius))
-        in makeSurroundingBox boxBeforeMovement boxAfterMovement
+        in Right $ makeSurroundingBox boxBeforeMovement boxAfterMovement

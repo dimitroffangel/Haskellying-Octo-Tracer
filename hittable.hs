@@ -8,6 +8,7 @@ import Sphere
 import MovingSphere
 import GeneratingRandomStuff
 import UtilityFunctions
+import AxisAlignedBoundingBox
 
 
 -- newtype HittableList = HittableList [Sphere]
@@ -16,6 +17,9 @@ clear hittableList = []
 
 hit sphere@(Sphere sphereCenter sphereRadius sphereMaterial)  = hitSphere sphere
 hit movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime)  = hitMovingSphere movingSphere
+
+makeBoundingBox movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime) = sphereMakeBoundingBox movingSphere
+makeBoundingBox sphere@(Sphere sphereCenter sphereRadius sphereMaterial) = movingSphereMakeBoundBox sphere
 
 
 hitList hittableList ray@(Ray rayOrigin rayDirection _) tMin tMax hitRecord =
@@ -28,6 +32,23 @@ hitList hittableList ray@(Ray rayOrigin rayDirection _) tMin tMax hitRecord =
                 in case newHit of 
                     (Left _) -> hitHelper rest closestT tempHitRecord hasHit
                     (Right resultHit) -> hitHelper rest (t resultHit) resultHit True
+
+-- construct the boundingBox for a list of geometryObjects
+hitListBoundingBox hittableList fromInterval toInterval currentBox =
+    hitListBoundingBoxHelper hittableList fromInterval toInterval currentBox False
+    where
+        -- has reached the ened return the result
+        hitListBoundingBoxHelper [] _ _ resultBox True = Right resultBox
+        -- the list is empty from the get go
+        hitListBoundingBoxHelper [] _ _ resultBox False = Left resultBox
+        hitListBoundingBoxHelper (currentObject : restOfList) fromInterval toInterval resultBox hasNotChangedBox =
+            let newBoundingBox = makeBoundingBox currentObject fromInterval toInterval 
+            in case newBoundingBox of 
+                -- if constructing a bounding box for the current object has failed return the currentBox
+                (Left _) -> Left resultBox
+                -- bind the newly-formed bounding box with the currentlyFound
+                (Right box) -> hitListBoundingBoxHelper restOfList fromInterval toInterval (makeSurroundingBox box resultBox) True
+
             
               
 groundMaterial = LambertianMaterial $ Vector 0.5 0.5 0.5
