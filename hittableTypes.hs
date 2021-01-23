@@ -3,6 +3,8 @@ module HittableTypes where
 import HitRecord
 import Vector
 
+
+
 data GeometryObject = Sphere {
     sphereCenter :: Vector,
     sphereRadius :: Double,
@@ -14,4 +16,6 @@ data GeometryObject = Sphere {
     sphereMaterial :: Material,
     movingFromTime :: Double,
     movingUntilTime :: Double
-}deriving (Show, Read, Eq)
+} deriving (Show, Read, Eq)
+
+

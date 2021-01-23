@@ -11,7 +11,7 @@ import UtilityFunctions
 import AxisAlignedBoundingBox
 
 
--- newtype HittableList = HittableList [Sphere]
+newtype HittableList = HittableList [GeometryObject]
 
 clear hittableList = []
 

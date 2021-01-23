@@ -10,6 +10,7 @@ import GeneratingRandomStuff
 import Camera
 import UtilityFunctions
 import AxisAlignedBoundingBox
+import HittableTypes
 
 -- constants
 infinity = 1.79769e+308
