@@ -33,3 +33,15 @@ hitAABB (AABB (Vector xMinimum yMinimum zMinimum) (Vector xMaximum yMaximum zMax
             in if inverseD < 0
                 then calculateMaxMin t1 t0 tMin tMax
                 else calculateMaxMin t0 t1 tMin tMax
+
+
+makeSurroundingBox (AABB minLHS maxLHS) (AABB minRHS maxRHS) = 
+    let minPoint = Vector 
+                            (min (x minLHS) (x minRHS))
+                            (min (y minLHS) (y minRHS))
+                            (min (z minLHS) (z minRHS))
+        maxPoint = Vector 
+                            (max (x maxLHS) (x maxRHS))
+                            (max (y maxLHS) (y maxRHS))
+                            (max (z maxLHS) (z maxRHS))
+        in AABB minPoint maxPoint

@@ -5,6 +5,7 @@ import Ray
 import HitRecord
 import Vector
 import HittableTypes
+import AxisAlignedBoundingBox
 
 
 -- sphere equation for point P:(x,y,z) and sphere with center C:(Cx, Cy, Cz) and radius R
@@ -43,3 +44,11 @@ hitSphere (Sphere sphereCenter sphereRadius sphereMaterial) ray@(Ray rayOrigin r
                                 newPoint = (getPointLocation ray newT)
                                 in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
                                     scalarDivision (newPoint - sphereCenter) sphereRadius
+
+
+
+
+sphereBoundingBox (Sphere sphereCenter sphereRadius sphereMaterial) = 
+    AABB 
+        (sphereCenter - (Vector sphereRadius sphereRadius sphereRadius))
+        (sphereCenter - (Vector sphereRadius sphereRadius sphereRadius))

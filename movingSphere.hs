@@ -4,6 +4,7 @@ import Ray
 import HitRecord
 import Vector
 import HittableTypes
+import AxisAlignedBoundingBox
 
 
 moveSphere (MovingSphere centerInitially centerAfterTime _ _ movingFromTime movingUntilTime ) time =
@@ -47,3 +48,16 @@ hitMovingSphere movingSphere@(MovingSphere sphereCenterInitially sphereCenterAft
                                 newPoint = (getPointLocation ray newT)
                                 in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
                                     scalarDivision (newPoint - sphereCenterInitially) sphereRadius
+
+
+
+
+movingSphereBoundBox movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime) fromInterval toInterval = 
+    let 
+        boxBeforeMovement = AABB 
+                (moveSphere movingSphere fromInterval + (Vector sphereRadius sphereRadius sphereRadius))
+                (moveSphere movingSphere fromInterval + (Vector sphereRadius sphereRadius sphereRadius))
+        boxAfterMovement = AABB 
+                (moveSphere movingSphere toInterval + (Vector sphereRadius sphereRadius sphereRadius))
+                (moveSphere movingSphere toInterval + (Vector sphereRadius sphereRadius sphereRadius))
+        in makeSurroundingBox boxBeforeMovement boxAfterMovement
