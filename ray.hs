@@ -7,10 +7,11 @@ import Vector
 --  P(t)= origin+t*direction
 data Ray = Ray {
     origin :: Vector,
-    direction :: Vector 
+    direction :: Vector ,
+    timeToLive :: Double
 } deriving (Show, Read, Eq)
 
-getPointLocation (Ray origin direction) t = origin + scalarMultiplication direction t
+getPointLocation (Ray origin direction _) t = origin + scalarMultiplication direction t
 
 
 -- sphere equation for point P:(x,y,z) and sphere with center C:(Cx, Cy, Cz) and radius R

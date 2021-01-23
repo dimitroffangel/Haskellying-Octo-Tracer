@@ -1,10 +1,13 @@
-module Sphere where
-
+module MovingSphere where
 
 import Ray
 import HitRecord
 import Vector
 import HittableTypes
+
+
+moveSphere (MovingSphere centerInitially centerAfterTime _ _ movingFromTime movingUntilTime ) time =
+    centerInitially + (scalarMultiplication (centerInitially - centerAfterTime) $ (time - movingFromTime) / (movingUntilTime - movingFromTime))
 
 
 -- sphere equation for point P:(x,y,z) and sphere with center C:(Cx, Cy, Cz) and radius R
@@ -16,10 +19,11 @@ import HittableTypes
 -- (origin + t*direction - C)(origin + t*direction - C) = R^2
 -- t^2*direction*direction + 2t*direction * (origin -C) + (origin - C)(origin - C) - R^2 = 0
 -- if has two roots - two collisions with outer sphere and so forth
-hitSphere (Sphere sphereCenter sphereRadius sphereMaterial) ray@(Ray rayOrigin rayDirection _) 
+hitMovingSphere movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime) ray@(Ray rayOrigin rayDirection rayTime) 
     tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordMaterial hitRecordT hitRecordFrontFace) = 
     let 
-        vectorFromTheCenter = rayOrigin - sphereCenter
+        movedCenter = (moveSphere movingSphere rayTime)
+        vectorFromTheCenter = rayOrigin - movedCenter
         a =  getSquaredVector rayDirection
         halfB = dotProduct vectorFromTheCenter rayDirection
         c = getSquaredVector vectorFromTheCenter - (sphereRadius * sphereRadius)
@@ -37,9 +41,9 @@ hitSphere (Sphere sphereCenter sphereRadius sphereMaterial) ray@(Ray rayOrigin r
                                             newT = secondRoot
                                             newPoint = (getPointLocation ray newT)
                                             in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
-                                                scalarDivision (newPoint - sphereCenter) sphereRadius
+                                                scalarDivision (newPoint - movedCenter) sphereRadius
                         else let 
                                 newT = firstRoot
                                 newPoint = (getPointLocation ray newT)
                                 in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
-                                    scalarDivision (newPoint - sphereCenter) sphereRadius
+                                    scalarDivision (newPoint - sphereCenterInitially) sphereRadius

@@ -52,7 +52,7 @@ getRandomVectorInUnitSphere =
 getRandomVectorInDiskCenter =
     do 
         x <- generateNumberInInterval (-1) 1
-        y <- generateNumberInInterval (-1) 1
+        y <- generateNumberInInterval (-1) 1 
         if x^2 + y^2 > 1
             then getRandomVectorInUnitSphere
             else return $ Vector x y 0

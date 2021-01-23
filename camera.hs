@@ -5,7 +5,7 @@ import Ray
 import UtilityFunctions
 
 -- image info
-aspectRatio = 16.0 / 9.0
+aspectRatio = 16 / 9
 imageWidth :: Int
 imageWidth = 400
 imageHeight :: Int
@@ -26,12 +26,13 @@ defaultHorizontal = Vector (realToFrac defaultViewportWidth) 0 0
 defaultVertical = Vector 0 2 0
 defaultLowerLeftCorner = defaultOriginLocation - scalarDivision defaultHorizontal 2 - scalarDivision defaultVertical 2 - Vector 0 0 defaultFocalLength
 
-getRay s t camera unitDiskVector = 
+getRay s t camera unitDiskVector randomInitialStartOfCasting = 
     let 
         radiusVector@(Vector xRadiusVector yRadiusVector zRadiusVector) = scalarMultiplication unitDiskVector (cameraLensRadius camera)
         offset = scalarMultiplication (cameraRelativeU camera) xRadiusVector + scalarMultiplication (cameraRelativeV camera) yRadiusVector
-    in  Ray (cameraOrigin camera + offset) $ 
-        (cameraLowerLeftCorner camera) + scalarMultiplication (cameraHorizontal camera) s + scalarMultiplication (cameraVertical camera) t - (cameraOrigin camera) - offset
+    in  Ray (cameraOrigin camera + offset)
+        ((cameraLowerLeftCorner camera) + scalarMultiplication (cameraHorizontal camera) s + scalarMultiplication (cameraVertical camera) t - (cameraOrigin camera) - offset)
+        $ randomInitialStartOfCasting
 
 data Camera = Camera {
     cameraOrigin :: Vector,
@@ -45,10 +46,12 @@ data Camera = Camera {
     cameraRelativeU :: Vector,
     cameraRelativeV :: Vector,
     cameraRelativeW :: Vector,
-    cameraLensRadius :: Double
+    cameraLensRadius :: Double,
+    sendRayFromTime :: Double,
+    sendRayUntilTime :: Double
 } deriving (Show, Read, Eq)
 
-constructCamera verticalFieldOfView aspectRatio aperture focusDist lookFrom lookAt viewUp =
+constructCamera verticalFieldOfView aspectRatio aperture focusDist lookFrom lookAt viewUp sendRayFromTime sendRayUntilTime =
     let theta = degreesToRadians verticalFieldOfView
         height = tan(theta / 2)
         viewportHeight = 2.0 * height
@@ -72,3 +75,5 @@ constructCamera verticalFieldOfView aspectRatio aperture focusDist lookFrom look
                 v
                 w
                 (aperture / 2)
+                sendRayFromTime
+                sendRayUntilTime

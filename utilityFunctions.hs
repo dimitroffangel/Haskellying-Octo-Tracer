@@ -7,3 +7,7 @@ clamp x min max
     | x < min = min
     | x > max = max
     | otherwise = x
+
+
+wrapInIO :: a -> IO a
+wrapInIO = return

@@ -21,7 +21,7 @@ data Material = LambertianMaterial {
         indexOfRefraction :: Double
     }
     | Void
-
+    deriving (Show, Read, Eq)
 
 data HitRecord = HitRecord {
         point :: Vector,
@@ -29,11 +29,11 @@ data HitRecord = HitRecord {
         hitRecordMaterial :: Material,
         t :: Double,
         frontFace :: Bool
-    }
+    }deriving (Show, Read, Eq)
 
 emptyHitRecord = HitRecord (Vector 0 0 0) (Vector 0 0 0) Void 0 False
 
-setFaceNormal (HitRecord point _ material t frontFace) (Ray origin direction) outwardNormal = 
+setFaceNormal (HitRecord point _ material t frontFace) (Ray origin direction rayTime) outwardNormal = 
     let newFrontFace = dotProduct direction outwardNormal < 0 
         in if newFrontFace 
                 then HitRecord point outwardNormal  material t newFrontFace
@@ -41,18 +41,18 @@ setFaceNormal (HitRecord point _ material t frontFace) (Ray origin direction) ou
 
 
 
-getScatteredRay lambMaterial@(LambertianMaterial _) hit incomingRay@(Ray origin direction) unitSphereVector randomNumber
+getScatteredRay lambMaterial@(LambertianMaterial _) hit incomingRay@(Ray origin direction rayTime) unitSphereVector randomNumber
     | isVectorNearZero unitSphereVector = getScatteredRay lambMaterial hit incomingRay (Vector 0 0 0) randomNumber
-    | otherwise = Right $ Ray (point hit) $ normalVector hit + unitSphereVector
+    | otherwise = Right $ Ray (point hit) (normalVector hit + unitSphereVector) rayTime
 
-getScatteredRay (Metal colour fuzziness) hit incomingRay@(Ray origin direction) unitSphereVector _ = 
-    let result@(Ray resultOrigin resultDirection)= Ray (point hit) $ (reflect (getUnitVector direction) (normalVector hit)) + 
-                scalarMultiplication unitSphereVector fuzziness 
+getScatteredRay (Metal colour fuzziness) hit incomingRay@(Ray origin direction time) unitSphereVector _ = 
+    let result@(Ray resultOrigin resultDirection resultTime)= Ray (point hit) ((reflect (getUnitVector direction) (normalVector hit)) + 
+                scalarMultiplication unitSphereVector fuzziness) time
         in if (dotProduct resultDirection (normalVector hit)) > 0
             then Right result
             else Left result
 
-getScatteredRay (Dielectric indexOfRefraction) hit incomingRay@(Ray origin direction) unitSphereVector randomNumber = 
+getScatteredRay (Dielectric indexOfRefraction) hit incomingRay@(Ray origin direction time) unitSphereVector randomNumber = 
     if frontFace hit 
         then refractReflectRay $ 1 / indexOfRefraction
         else refractReflectRay indexOfRefraction 
@@ -63,8 +63,8 @@ getScatteredRay (Dielectric indexOfRefraction) hit incomingRay@(Ray origin direc
             refractReflectRay refractionRatio 
             -- cannot refract because the sin of theta' gets above 1, so reflect 
                 | (refractionRatio * sinTheta > 1) || (reflectance cosTheta refractionRatio) > randomNumber = 
-                    Right $ Ray (point hit) $ reflect unitDirection $ normalVector hit
-                | otherwise = Right $ Ray (point hit) $ refract unitDirection (normalVector hit) refractionRatio
+                    Right $ Ray (point hit) (reflect unitDirection (normalVector hit)) time
+                | otherwise = Right $ Ray (point hit) (refract unitDirection (normalVector hit) refractionRatio) time
 
 getColourAfterRay (LambertianMaterial colour) = colour  
 getColourAfterRay (Metal colour _) = colour  
