@@ -48,7 +48,7 @@ hitSphere (Sphere sphereCenter sphereRadius sphereMaterial) ray@(Ray rayOrigin r
 
 
 
-sphereBoundingBox (Sphere sphereCenter sphereRadius sphereMaterial) = 
+sphereMakeBoundingBox (Sphere sphereCenter sphereRadius sphereMaterial) = 
     AABB 
         (sphereCenter - (Vector sphereRadius sphereRadius sphereRadius))
         (sphereCenter - (Vector sphereRadius sphereRadius sphereRadius))

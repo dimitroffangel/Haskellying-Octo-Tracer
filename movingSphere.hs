@@ -52,7 +52,7 @@ hitMovingSphere movingSphere@(MovingSphere sphereCenterInitially sphereCenterAft
 
 
 
-movingSphereBoundBox movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime) fromInterval toInterval = 
+movingSphereMakeBoundBox movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime) fromInterval toInterval = 
     let 
         boxBeforeMovement = AABB 
                 (moveSphere movingSphere fromInterval + (Vector sphereRadius sphereRadius sphereRadius))
