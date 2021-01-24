@@ -20,7 +20,8 @@ demoRadius = cos (pi / 4)
 --         Sphere (Vector demoRadius 0 (-1)) demoRadius (LambertianMaterial (Vector 1 0 0))
 --     ]
 --
-world = generateRandomScene (0) 4 (0) 4 []
+
+world = generateRandomScene (0) 2 (0) 2 []
 
 -- world =   wrapInIO  [    
 --             Sphere (Vector 0.0 (-100.5) (-1)) 100 (LambertianMaterial $ Vector 0.8 0.8 0),
@@ -68,7 +69,7 @@ rayColour ray@(Ray origin direction _) worldObjects depth =
                             in case scatteredRay of
                                 (Left _) -> return $ Vector 0 0 0
                                 (Right finalResult) -> (rayColour finalResult worldObjects $ depth - 1)
-                    return $ getNewRay * (getColourAfterRay $ hitRecordMaterial hit)  
+                    return $ getNewRay * (getColourAfterRay (hitRecordMaterial hit) hit)  
 
             (Left _) -> 
                 let (Vector _ y _) = getUnitVector direction

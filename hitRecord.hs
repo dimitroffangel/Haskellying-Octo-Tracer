@@ -3,7 +3,7 @@ module HitRecord where
 import Ray
 import Vector
 import GeneratingRandomStuff
-
+import Texture
 
 clampFuzziness :: Double -> Double
 clampFuzziness a 
@@ -11,7 +11,7 @@ clampFuzziness a
     | otherwise = 1
 
 data Material = LambertianMaterial {
-        colour :: Vector
+        lambertianColour :: Texture
     }
     | Metal {
         colour :: Vector,
@@ -27,17 +27,19 @@ data HitRecord = HitRecord {
         point :: Vector,
         normalVector :: Vector,
         hitRecordMaterial :: Material,
+        u :: Double,
+        v :: Double,
         t :: Double,
         frontFace :: Bool
     }deriving (Show, Read, Eq)
 
-emptyHitRecord = HitRecord (Vector 0 0 0) (Vector 0 0 0) Void 0 False
+emptyHitRecord = HitRecord (Vector 0 0 0) (Vector 0 0 0) Void 0 0 0 False
 
-setFaceNormal (HitRecord point _ material t frontFace) (Ray origin direction rayTime) outwardNormal = 
+setFaceNormal (HitRecord point _ material u v t frontFace) (Ray origin direction rayTime) outwardNormal = 
     let newFrontFace = dotProduct direction outwardNormal < 0 
         in if newFrontFace 
-                then HitRecord point outwardNormal  material t newFrontFace
-                else HitRecord point (-outwardNormal) material t newFrontFace
+                then HitRecord point outwardNormal  material u v t newFrontFace
+                else HitRecord point (-outwardNormal) material u v t newFrontFace
 
 
 getScatteredRay lambMaterial@(LambertianMaterial _) hit incomingRay@(Ray origin direction rayTime) unitSphereVector randomNumber
@@ -65,9 +67,9 @@ getScatteredRay (Dielectric indexOfRefraction) hit incomingRay@(Ray origin direc
                     Right $ Ray (point hit) (reflect unitDirection (normalVector hit)) time
                 | otherwise = Right $ Ray (point hit) (refract unitDirection (normalVector hit) refractionRatio) time
 
-getColourAfterRay (LambertianMaterial colour) = colour  
-getColourAfterRay (Metal colour _) = colour  
-getColourAfterRay (Dielectric _) = Vector 1 1 1
+getColourAfterRay (LambertianMaterial colour) hitRecord = getTextureValue colour (u hitRecord) (v hitRecord) (point hitRecord)   
+getColourAfterRay (Metal colour _) hitRecord = colour   
+getColourAfterRay (Dielectric _) hitRecord = Vector 1 1 1
 
 reflectance cosine indexOfReflactance =
     let r0 = (1 - indexOfReflactance) / (1 + indexOfReflactance)

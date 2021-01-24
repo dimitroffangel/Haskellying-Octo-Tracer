@@ -9,6 +9,7 @@ import MovingSphere
 import GeneratingRandomStuff
 import UtilityFunctions
 import AxisAlignedBoundingBox
+import Texture
 
 
 clear hittableList = []
@@ -56,14 +57,20 @@ hitListBoundingBox hittableList fromInterval toInterval currentBox =
 
             
               
-groundMaterial = LambertianMaterial $ Vector 0.5 0.5 0.5
+groundMaterial = LambertianMaterial $ 
+                        SimpleTexture (SolidColourTexture $ SolidColour $ Vector 0.2 0.3 0.1) 
+                                      (SolidColourTexture $ SolidColour $ Vector 0.2 0.9 0.9)
+
+
+-- groundMaterial = LambertianMaterial $ SolidColourTexture $ SolidColour $ Vector 0.5 0.5 0.5
+
 
 generateRandomScene xIndex maxXIndex yIndex maxYIndex result 
     | xIndex == maxXIndex && yIndex == maxYIndex - 1 = 
         wrapInIO $ HittableList $ 
                 (HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 groundMaterial) :
                 (HittableGeometry $ Sphere (Vector 0 1 0) 1 $ Dielectric 1.5) : 
-                (HittableGeometry $ Sphere (Vector (-4) 1 0) 1 $ LambertianMaterial $ Vector 0.4 0.2 0.1) : 
+                (HittableGeometry $ Sphere (Vector (-4) 1 0) 1 $ LambertianMaterial $ (SolidColourTexture $ SolidColour $ Vector 0.4 0.2 0.1)) : 
                 (HittableGeometry $ Sphere (Vector 4 1 0) 1 $ Metal (Vector 0.7 0.6 0.5) 0) : (reverse result)
     | xIndex == maxXIndex = generateRandomScene (0) maxXIndex (yIndex + 1) maxYIndex result
     | otherwise = 
@@ -80,14 +87,17 @@ generateRandomScene xIndex maxXIndex yIndex maxYIndex result
                 centerAfterMoving = pointCenter + (Vector 0 yCenterAfterMoving 0)
                 in if getSquaredVector (pointCenter - (Vector 4 0.2 0)) < 0.81
                         then generateRandomScene (xIndex + 1) maxXIndex yIndex maxYIndex result
-                        else produceObject pointCenter centerAfterMoving materialCoefficient xRandom zRandom randomVectorColour randomVectorColour2 metalColour metalFuzziness
+                        else produceObject pointCenter centerAfterMoving materialCoefficient xRandom zRandom randomVectorColour 
+                                    randomVectorColour2 metalColour metalFuzziness
                             where
-                                produceObject pointCenter centerAfterMoving materialCoefficient xRandom zRandom randomVectorColour randomVectorColour2 metalColour metalFuzziness
+                                produceObject pointCenter centerAfterMoving materialCoefficient xRandom zRandom randomVectorColour 
+                                    randomVectorColour2 metalColour metalFuzziness
                                  -- lambertian  
                                     | (materialCoefficient < 0.8) = 
                                         generateRandomScene (xIndex + 1) maxXIndex yIndex maxYIndex 
                                             ((HittableGeometry $ MovingSphere pointCenter centerAfterMoving 0.2 
-                                                                (LambertianMaterial $ randomVectorColour * randomVectorColour2) 0 1) : result) 
+                                                                (LambertianMaterial $ SolidColourTexture $ SolidColour 
+                                                                $ randomVectorColour * randomVectorColour2) 0 1) : result) 
                                 -- metal
                                     | (materialCoefficient < 0.95) =  generateRandomScene (xIndex + 1) maxXIndex yIndex maxYIndex 
                                         ((HittableGeometry $ Sphere pointCenter 0.2 $ Metal metalColour metalFuzziness) : result)

@@ -17,8 +17,8 @@ import AxisAlignedBoundingBox
 -- (origin + t*direction - C)(origin + t*direction - C) = R^2
 -- t^2*direction*direction + 2t*direction * (origin -C) + (origin - C)(origin - C) - R^2 = 0
 -- if has two roots - two collisions with outer sphere and so forth
-hitSphere (Sphere sphereCenter sphereRadius sphereMaterial) ray@(Ray rayOrigin rayDirection _) 
-    tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordMaterial hitRecordT hitRecordFrontFace) = 
+hitSphere sphere@(Sphere sphereCenter sphereRadius sphereMaterial) ray@(Ray rayOrigin rayDirection _) 
+    tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordMaterial u v hitRecordT hitRecordFrontFace) = 
     let 
         vectorFromTheCenter = rayOrigin - sphereCenter
         a =  getSquaredVector rayDirection
@@ -37,13 +37,20 @@ hitSphere (Sphere sphereCenter sphereRadius sphereMaterial) ray@(Ray rayOrigin r
                                     else let 
                                             newT = secondRoot
                                             newPoint = (getPointLocation ray newT)
-                                            in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
-                                                scalarDivision (newPoint - sphereCenter) sphereRadius
+                                            outwardNormal = scalarDivision (newPoint - sphereCenter) sphereRadius
+                                            (newU, newV) = getSphereUV sphere outwardNormal
+                                            in Right $ 
+                                                setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newU newV newT hitRecordFrontFace) 
+                                                ray outwardNormal
                         else let 
                                 newT = firstRoot
                                 newPoint = (getPointLocation ray newT)
-                                in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
-                                    scalarDivision (newPoint - sphereCenter) sphereRadius
+                                outwardNormal = scalarDivision (newPoint - sphereCenter) sphereRadius 
+                                (newU, newV) = getSphereUV sphere outwardNormal
+                                in Right $ 
+                                    setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newU newV newT hitRecordFrontFace) 
+                                    ray outwardNormal
+                                    
 
 
 
@@ -53,3 +60,17 @@ sphereMakeBoundingBox (Sphere sphereCenter sphereRadius sphereMaterial) fromInte
         AABB 
             (sphereCenter - (Vector sphereRadius sphereRadius sphereRadius))
             (sphereCenter - (Vector sphereRadius sphereRadius sphereRadius))
+
+
+-- (theta fi) -> (0, 0) -> lower left corner
+-- y = - cos(theta)
+-- x = - cosfi sin theta
+-- z = sin fi sin theta
+-- sin theta = x / - cosfi = z / sin fi <=> x /z = - sin fi / cos fi <=> - x / z = sin fi / cos fi <=> - x / z = tg fi
+-- fi = atan2(z, -x) + pi
+-- theta = acos -y
+getSphereUV (Sphere sphereCenter sphereRadius sphereMaterial) pointOnSphere@(Vector x y z) =
+    let 
+        theta = acos (-y)
+        phi = (atan2 (-z) x) + pi
+        in (phi / (2*pi),  theta / pi)

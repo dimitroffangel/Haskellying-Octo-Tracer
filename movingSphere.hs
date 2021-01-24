@@ -20,8 +20,9 @@ moveSphere (MovingSphere centerInitially centerAfterTime _ _ movingFromTime movi
 -- (origin + t*direction - C)(origin + t*direction - C) = R^2
 -- t^2*direction*direction + 2t*direction * (origin -C) + (origin - C)(origin - C) - R^2 = 0
 -- if has two roots - two collisions with outer sphere and so forth
-hitMovingSphere movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime) ray@(Ray rayOrigin rayDirection rayTime) 
-    tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordMaterial hitRecordT hitRecordFrontFace) = 
+hitMovingSphere movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime) 
+                ray@(Ray rayOrigin rayDirection rayTime) 
+                tMin tMax hitRecord@(HitRecord hitRecordPoint hitRecordNormal hitRecordMaterial u v hitRecordT hitRecordFrontFace) = 
     let 
         movedCenter = (moveSphere movingSphere rayTime)
         vectorFromTheCenter = rayOrigin - movedCenter
@@ -41,12 +42,12 @@ hitMovingSphere movingSphere@(MovingSphere sphereCenterInitially sphereCenterAft
                                     else let 
                                             newT = secondRoot
                                             newPoint = (getPointLocation ray newT)
-                                            in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
+                                            in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial u v newT hitRecordFrontFace) ray $ 
                                                 scalarDivision (newPoint - movedCenter) sphereRadius
                         else let 
                                 newT = firstRoot
                                 newPoint = (getPointLocation ray newT)
-                                in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial newT hitRecordFrontFace) ray $ 
+                                in Right $ setFaceNormal (HitRecord newPoint hitRecordNormal sphereMaterial u v newT hitRecordFrontFace) ray $ 
                                     scalarDivision (newPoint - sphereCenterInitially) sphereRadius
 
 
