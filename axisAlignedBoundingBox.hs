@@ -6,7 +6,7 @@ import Vector
 data AABB = AABB {
     minimumPoint :: Vector,
     maximumPoint :: Vector
-} deriving (Show, Read, Eq)
+} | EmptyAABB deriving (Show, Read, Eq)
 
 constructAABB pointA pointB = AABB pointA pointB
 

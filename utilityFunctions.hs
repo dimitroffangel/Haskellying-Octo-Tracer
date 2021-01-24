@@ -11,3 +11,11 @@ clamp x min max
 
 wrapInIO :: a -> IO a
 wrapInIO = return
+
+
+quicksort [] _ = []
+quicksort (xHead : xTail) compareFunc = 
+    quicksort lesser compareFunc ++ (xHead : quicksort greater compareFunc)
+    where 
+            lesser = filter (not . compareFunc xHead) xTail
+            greater = filter (compareFunc xHead) xTail
