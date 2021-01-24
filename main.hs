@@ -11,6 +11,7 @@ import Camera
 import UtilityFunctions
 import AxisAlignedBoundingBox
 import HittableTypes
+import Texture
 
 
 -- constants
@@ -27,17 +28,19 @@ background1 = Vector 0.7 0.8 1
 background2 = Vector 0.7 0.8 1
 background3 = Vector 0.7 0.8 1
 
-world = generateRandomScene (0) 4 (0) 4 []
-world2 = generateSecondScene 
-world4 = sceneWithSimpleLight
+randomScene = generateRandomScene (0) 4 (0) 4 []
+sceneWithTextureOfSinusAndCosinus = generateSecondScene 
+simpleDiffuseTextureTest = sceneWithSimpleLight
 
--- world =   wrapInIO  [    
---             Sphere (Vector 0.0 (-100.5) (-1)) 100 (LambertianMaterial $ Vector 0.8 0.8 0),
---             Sphere (Vector 0.0 0.0 (-1.0)) 0.5 (LambertianMaterial $ Vector 0.1 0.2 0.5),
---             Sphere (Vector (-1) 0 (-1)) 0.5 (Dielectric 1.5),    
---             Sphere (Vector (-1) 0 (-1)) (-0.45) (Dielectric 1.5),
---             Sphere (Vector 1 0 (-1)) 0.5 (Metal (Vector 0.8 0.6 0.2) $ clampFuzziness 0) 
---             ]
+depthOfFieldLookFrom = Vector (3) 3 2 
+depthOfFieldLookAt = Vector 0 0 (-1)
+depthOfFieldViewUp = Vector 0 1 0
+depthOfFieldOfDistToFocus = getVectorLength (lookFrom - lookAt)
+depthOfFieldAspectRatio = 16/ 9
+depthOfFieldAperture = 2
+depthOfFieldVerticalOfView = 20
+depthOfFieldOfViewMainCamera = constructCamera depthOfFieldVerticalOfView depthOfFieldAspectRatio depthOfFieldAperture depthOfFieldOfDistToFocus 
+                                                depthOfFieldLookFrom depthOfFieldLookAt depthOfFieldViewUp 0 1
 
 
 lookFrom = Vector 26 3  6
@@ -50,8 +53,8 @@ aperture = 0.1
 
 -- mainCamera = constructCamera 90 aspectRatio (Vector (-2) 2 1) (Vector 0 0 (-1)) (Vector 0 1 0)
 -- mainCamera = constructCamera 20 aspectRatio (Vector (-2) 2 1) (Vector 0 0 (-1)) (Vector 0 1 0)
-mainCamera = constructCamera 20 aspectRatio aperture distToFocus lookFrom lookAt viewUp 0 1
-
+-- mainCamera = constructCamera 20 aspectRatio aperture distToFocus lookFrom lookAt viewUp 0 1
+mainCamera = depthOfFieldOfViewMainCamera
 
 maxDepth = 10
 
@@ -108,5 +111,5 @@ testingPicture currentWidth currentHeight result world background
 
 runTest = 
     do 
-        getWorld <- world4
+        getWorld <- randomScene
         saveImage (testingPicture 0 (imageHeight -1) [] getWorld background1) "./foo.ppm"

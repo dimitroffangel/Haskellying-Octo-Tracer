@@ -31,7 +31,7 @@ stringToDouble (x:xs) result = stringToDouble xs $ (read x :: Double) : result
 
 splitOn [] symbol currentString result = filter (/= "") $ reverse $ reverse currentString : result
 splitOn (head : rest) symbol currentString result 
-    | head == symbol = splitOn rest symbol "" (reverse currentString : result)
+    | head == symbol || head == '\n'  = splitOn rest symbol "" (reverse currentString : result)
     | otherwise = splitOn rest symbol (head : currentString) result
 
 convertRgbToString (Vector red green blue) =
@@ -78,7 +78,6 @@ loadImage filePath = do
         -- create the Rgb objects from the integers in one array -> split the array on height number of arrays each with length width
         -- create the final image from width height and the newly formed content from
         in return $ Image (floor width) (floor height) $ splitListOnLists (floor width) $ bindPixels (drop 3 integers) []
-
 bindPixels :: [Double] -> [Rgb] -> [Rgb]
 bindPixels [] result = reverse result
 bindPixels (red : green : blue : tail) result = bindPixels tail 
