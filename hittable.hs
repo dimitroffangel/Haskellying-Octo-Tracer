@@ -104,3 +104,9 @@ generateRandomScene xIndex maxXIndex yIndex maxYIndex result
                                     | otherwise = generateRandomScene (xIndex + 1) maxXIndex yIndex maxYIndex 
                                         ((HittableGeometry $ Sphere pointCenter 0.2 $ Dielectric 1.5) : result)
                            
+
+generateSecondScene =  wrapInIO $ 
+                                    HittableList $ [
+                                                    (HittableGeometry $ Sphere (Vector 0 (-10) 0) 10 groundMaterial),
+                                                    (HittableGeometry $ Sphere (Vector 0 (10) 0) 10 groundMaterial)
+                                                ]

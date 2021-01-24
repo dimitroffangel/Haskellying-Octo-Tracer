@@ -22,6 +22,7 @@ demoRadius = cos (pi / 4)
 --
 
 world = generateRandomScene (0) 2 (0) 2 []
+world2 = generateSecondScene 
 
 -- world =   wrapInIO  [    
 --             Sphere (Vector 0.0 (-100.5) (-1)) 100 (LambertianMaterial $ Vector 0.8 0.8 0),
@@ -102,5 +103,5 @@ testingPicture currentWidth currentHeight result world
 
 runTest = 
     do 
-        getWorld <- world
+        getWorld <- world2
         saveImage (testingPicture 0 (imageHeight -1) [] getWorld) "./foo.ppm"
