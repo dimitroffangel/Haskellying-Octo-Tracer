@@ -12,6 +12,7 @@ import UtilityFunctions
 import AxisAlignedBoundingBox
 import HittableTypes
 
+
 -- constants
 infinity = 1.79769e+308
 demoRadius = cos (pi / 4)
@@ -21,9 +22,14 @@ demoRadius = cos (pi / 4)
 --     ]
 --
 
-world = generateRandomScene (0) 2 (0) 2 []
+background0 = Vector 0 0 0
+background1 = Vector 0.7 0.8 1
+background2 = Vector 0.7 0.8 1
+background3 = Vector 0.7 0.8 1
+
+world = generateRandomScene (0) 4 (0) 4 []
 world2 = generateSecondScene 
-world3 = generateThirdScene
+world4 = sceneWithSimpleLight
 
 -- world =   wrapInIO  [    
 --             Sphere (Vector 0.0 (-100.5) (-1)) 100 (LambertianMaterial $ Vector 0.8 0.8 0),
@@ -34,9 +40,10 @@ world3 = generateThirdScene
 --             ]
 
 
-
-lookFrom = Vector 13 2 3
-lookAt = Vector 0 0 (0)
+lookFrom = Vector 26 3  6
+-- lookFrom = Vector 13 2 3
+-- lookAt = Vector 0 0 (0)
+lookAt = Vector 0 2 0
 viewUp = Vector 0 1 0
 distToFocus = 10
 aperture = 0.1
@@ -46,16 +53,16 @@ aperture = 0.1
 mainCamera = constructCamera 20 aspectRatio aperture distToFocus lookFrom lookAt viewUp 0 1
 
 
-maxDepth = 50
+maxDepth = 10
 
 transformEitherToIO :: Either a a -> IO a
 transformEitherToIO (Right a) = return a
 transformEitherToIO (Left a) = return a
 
 -- linearly blends white and blue depending on y cooridnate of the unit vector of the ray direction
-rayColour :: (Eq a, Num a) => Ray -> HittableObject -> a -> IO Vector
-rayColour ray@(Ray origin direction _) worldObjects 0 = wrapInIO $ Vector 0 0 0
-rayColour ray@(Ray origin direction _) worldObjects depth =
+rayColour :: (Eq a, Num a) => Ray -> Vector -> HittableObject -> a -> IO Vector
+rayColour ray@(Ray origin direction _) backgroundColour worldObjects 0 = wrapInIO $ Vector 0 0 0
+rayColour ray@(Ray origin direction _) backgroundColour worldObjects depth =
     let hitResult = hit worldObjects ray 0.001 infinity emptyHitRecord
         in case hitResult of 
             (Right hit) -> 
@@ -69,18 +76,15 @@ rayColour ray@(Ray origin direction _) worldObjects depth =
                     getNewRay <- 
                         let scatteredRay = getScatteredRay (hitRecordMaterial hit) hit ray unitSphereVector randomNumber
                             in case scatteredRay of
-                                (Left _) -> return $ Vector 0 0 0
-                                (Right finalResult) -> (rayColour finalResult worldObjects $ depth - 1)
-                    return $ getNewRay * (getColourAfterRay (hitRecordMaterial hit) hit)  
+                                (Left _) -> wrapInIO $ getEmittedMaterialColour (hitRecordMaterial hit) hit
+                                (Right finalResult) -> (rayColour finalResult backgroundColour worldObjects $ depth - 1)
+                    return $ (getEmittedMaterialColour (hitRecordMaterial hit) hit) + getNewRay * (getColourAfterRay (hitRecordMaterial hit) hit)  
 
-            (Left _) -> 
-                let (Vector _ y _) = getUnitVector direction
-                    t = 0.5 * (y + 1)
-                in wrapInIO $ (scalarMultiplication (Vector 1.0 1.0 1.0) (1 - t)) + (scalarMultiplication (Vector 0.5 0.7 1) t)
+            (Left _) -> wrapInIO backgroundColour
 
 
-shadePixel 0 _ _ resultedColour _= wrapInIO resultedColour
-shadePixel index width height resultedColour world =
+shadePixel 0 _ _ resultedColour _ _ = wrapInIO resultedColour
+shadePixel index width height resultedColour world background =
     do
         randomGeneratedValueU <- generateNumberInInterval 0 1
         randomGeneratedValueV <- generateNumberInInterval 0 1
@@ -91,18 +95,18 @@ shadePixel index width height resultedColour world =
                 u =  ((realToFrac width) + randomGeneratedValueU) / realToFrac (imageWidth - 1)
                 v = ((realToFrac height) + randomGeneratedValueV) / realToFrac (imageHeight - 1)
                 ray = getRay u v mainCamera unitDiskVector getRandomInitialStartOfRayCasting
-                in (rayColour ray world maxDepth)
-        shadePixel (index - 1) width height (resultedColour + unwrappedColour) world
+                in (rayColour ray background world maxDepth)
+        shadePixel (index - 1) width height (resultedColour + unwrappedColour) world background
 
-testingPicture currentWidth currentHeight result world
+testingPicture currentWidth currentHeight result world background 
     | currentWidth == imageWidth && currentHeight == 0 = wrapInIO $ Image imageWidth imageHeight $ splitListOnLists imageWidth $ reverse result
-    | currentWidth == imageWidth = testingPicture 0 (currentHeight - 1) result world
+    | currentWidth == imageWidth = testingPicture 0 (currentHeight - 1) result world background
     | otherwise =  do
-                resultedPixel <- shadePixel samplePerPixel currentWidth currentHeight (Vector 0 0 0) world
-                testingPicture (currentWidth + 1) currentHeight (resultedPixel : result) world
+                resultedPixel <- shadePixel samplePerPixel currentWidth currentHeight (Vector 0 0 0) world background
+                testingPicture (currentWidth + 1) currentHeight (resultedPixel : result) world background
                 
 
 runTest = 
     do 
-        getWorld <- world3
-        saveImage (testingPicture 0 (imageHeight -1) [] getWorld) "./foo.ppm"
+        getWorld <- world4
+        saveImage (testingPicture 0 (imageHeight -1) [] getWorld background1) "./foo.ppm"

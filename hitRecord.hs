@@ -20,6 +20,9 @@ data Material = LambertianMaterial {
     | Dielectric{
         indexOfRefraction :: Double
     }
+    | DiffuseLight{
+        emitLight :: Texture
+    }
     | Void
     deriving (Show, Read, Eq)
 
@@ -67,9 +70,17 @@ getScatteredRay (Dielectric indexOfRefraction) hit incomingRay@(Ray origin direc
                     Right $ Ray (point hit) (reflect unitDirection (normalVector hit)) time
                 | otherwise = Right $ Ray (point hit) (refract unitDirection (normalVector hit) refractionRatio) time
 
+getScatteredRay (DiffuseLight _) _ incomingRay@(Ray origin direction time) _ _ = Left incomingRay 
+
+
 getColourAfterRay (LambertianMaterial colour) hitRecord = getTextureValue colour (u hitRecord) (v hitRecord) (point hitRecord)   
 getColourAfterRay (Metal colour _) hitRecord = colour   
 getColourAfterRay (Dielectric _) hitRecord = Vector 1 1 1
+getColourAfterRay (DiffuseLight emitLight) hitRecord = getTextureValue emitLight (u hitRecord) (v hitRecord) (point hitRecord)
+
+
+getEmittedMaterialColour (DiffuseLight emitLight) hitRecord = getTextureValue emitLight (u hitRecord) (v hitRecord) (point hitRecord)
+getEmittedMaterialColour _ _ = Vector 0 0 0 
 
 reflectance cosine indexOfReflactance =
     let r0 = (1 - indexOfReflactance) / (1 + indexOfReflactance)

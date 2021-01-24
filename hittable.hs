@@ -11,12 +11,14 @@ import UtilityFunctions
 import AxisAlignedBoundingBox
 import Texture
 import PerlinShade
+import XYRect
 
 
 clear hittableList = []
 
 hit (HittableGeometry sphere@(Sphere sphereCenter sphereRadius sphereMaterial))  = hitSphere sphere
 hit (HittableGeometry movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime))  = hitMovingSphere movingSphere
+hit (XYRectHittable xyRect@(XYRect x0 x1 y0 y1 z xyRectMaterial)) = hitXYRect xyRect
 hit (HittableList hittableList) = hitList hittableList
 
 makeBoundingBox (HittableGeometry 
@@ -26,7 +28,7 @@ makeBoundingBox (HittableGeometry
 makeBoundingBox (HittableGeometry 
                                 sphere@(Sphere sphereCenter sphereRadius sphereMaterial)) = movingSphereMakeBoundBox sphere
 
-
+makeBoundingBox (XYRectHittable xyRect@(XYRect x0 x1 y0 y1 z xyRectMaterial)) = xyRectBoundingBox xyRect
 makeBoundingBox (HittableList hittableList) = hitListBoundingBox hittableList
 
 hitList hittableList ray@(Ray rayOrigin rayDirection _) tMin tMax hitRecord =
@@ -113,14 +115,14 @@ generateSecondScene =  wrapInIO $
                                                 ]
 
 
-generateRandomNumbersForNoise1 =  transformListOfIOToIOOfList [generateNumberInInterval 0 1 | x <- [1..pointCounter]]
-generateRandomNumbersForNoise2 =  transformListOfIOToIOOfList [generateNumberInInterval 0 1 | x <- [1..pointCounter]]
-generateRandomNumbersForNoiseX1 = transformListOfIOToIOOfList  [generateIntegerInInterval 0 (pointCounter - x) | x <- [1..pointCounter]]
-generateRandomNumbersForNoiseX2 = transformListOfIOToIOOfList  [generateIntegerInInterval 0 (pointCounter - x) | x <- [1..pointCounter]]
-generateRandomNumbersForNoiseY1 = transformListOfIOToIOOfList  [generateIntegerInInterval 0 (pointCounter - x) | x <- [1..pointCounter]]
-generateRandomNumbersForNoiseY2 = transformListOfIOToIOOfList  [generateIntegerInInterval 0 (pointCounter - x) | x <- [1..pointCounter]]
-generateRandomNumbersForNoiseZ1 = transformListOfIOToIOOfList  [generateIntegerInInterval 0 (pointCounter - x) | x <- [1..pointCounter]]
-generateRandomNumbersForNoiseZ2 = transformListOfIOToIOOfList  [generateIntegerInInterval 0 (pointCounter - x) | x <- [1..pointCounter]]
+generateRandomNumbersForNoise1 =  transformListOfIOToIOOfList [ (generateNumberInInterval 0 1) | x <- [1..pointCounter]]
+generateRandomNumbersForNoise2 =  transformListOfIOToIOOfList [ (generateNumberInInterval 0 1) | x <- [1..pointCounter]]
+generateRandomNumbersForNoiseX1 = transformListOfIOToIOOfList  [(generateIntegerInInterval 0 (pointCounter - x)) | x <- [1..pointCounter]]
+generateRandomNumbersForNoiseX2 = transformListOfIOToIOOfList  [(generateIntegerInInterval 0 (pointCounter - x)) | x <- [1..pointCounter]]
+generateRandomNumbersForNoiseY1 = transformListOfIOToIOOfList  [(generateIntegerInInterval 0 (pointCounter - x)) | x <- [1..pointCounter]]
+generateRandomNumbersForNoiseY2 = transformListOfIOToIOOfList  [(generateIntegerInInterval 0 (pointCounter - x)) | x <- [1..pointCounter]]
+generateRandomNumbersForNoiseZ1 = transformListOfIOToIOOfList  [(generateIntegerInInterval 0 (pointCounter - x)) | x <- [1..pointCounter]]
+generateRandomNumbersForNoiseZ2 = transformListOfIOToIOOfList  [(generateIntegerInInterval 0 (pointCounter - x)) | x <- [1..pointCounter]]
 
 transformListOfIOToIOOfList list= 
     foldr (\el arr -> 
@@ -129,17 +131,7 @@ transformListOfIOToIOOfList list=
             unwrapARr <- arr
             return $ unwrapEl : unwrapARr
         ) (wrapInIO []) list
-
--- pertexMaterial1 = constructPerlinShader generateRandomNumbersForNoise1 
---                                             generateRandomNumbersForNoiseX1 
---                                             generateRandomNumbersForNoiseY1 
---                                             generateRandomNumbersForNoiseZ1
-
-                                            
--- pertexMaterial2 = constructPerlinShader generateRandomNumbersForNoise2
---                                             generateRandomNumbersForNoiseX2 
---                                             generateRandomNumbersForNoiseY2 
---                                             generateRandomNumbersForNoiseZ2
+                          
 
 generateThirdScene =  
     do
@@ -165,3 +157,13 @@ generateThirdScene =
                     (HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ NoiseTexture $ Noise pertexMaterial2))
                 ]            
             
+fooMaterial = DiffuseLight $ SolidColourTexture $ SolidColour $ Vector 4 4 4
+
+sceneWithSimpleLight = wrapInIO $ 
+        HittableList $
+            (HittableGeometry $ Sphere (Vector 0 7 0) 2 fooMaterial) :
+            (XYRectHittable $ XYRect 3 5 1 3 (-2) fooMaterial)  : 
+            [
+                (HittableGeometry $ Sphere (Vector 0 (2) 0) 2 (LambertianMaterial $ SolidColourTexture $ SolidColour $ Vector 0.8 0.8 0)),
+                (HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ SolidColourTexture $ SolidColour $ Vector 0.8 0.8 0))
+            ] 

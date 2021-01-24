@@ -25,6 +25,14 @@ data BVH = BVH {
   bvhBox :: AABB
 } deriving (Show, Read, Eq)
 
+data XYRect = XYRect{
+    x0 :: Double,
+    x1 :: Double,
+    y0 :: Double,
+    y1 :: Double,
+    xyRectZ :: Double,
+    xyRectMaterial :: Material
+} deriving (Show, Read, Eq)
 
 -- newtype HittableList = HittableList [GeometryObject]
 
@@ -35,6 +43,7 @@ data HittableObject =
         list :: [HittableObject]
     } 
     | BVHHittable (BVH) 
+    | XYRectHittable (XYRect)
     deriving (Show, Read, Eq)
 
 
