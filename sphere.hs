@@ -48,7 +48,7 @@ hitSphere (Sphere sphereCenter sphereRadius sphereMaterial) ray@(Ray rayOrigin r
 
 
 
-sphereMakeBoundingBox (Sphere sphereCenter sphereRadius sphereMaterial) fromInterval toInterval= 
+sphereMakeBoundingBox (Sphere sphereCenter sphereRadius sphereMaterial) fromInterval toInterval result= 
     Right $ 
         AABB 
             (sphereCenter - (Vector sphereRadius sphereRadius sphereRadius))

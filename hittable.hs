@@ -11,16 +11,21 @@ import UtilityFunctions
 import AxisAlignedBoundingBox
 
 
-newtype HittableList = HittableList [GeometryObject]
-
 clear hittableList = []
 
-hit sphere@(Sphere sphereCenter sphereRadius sphereMaterial)  = hitSphere sphere
-hit movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime)  = hitMovingSphere movingSphere
+hit (HittableGeometry sphere@(Sphere sphereCenter sphereRadius sphereMaterial))  = hitSphere sphere
+hit (HittableGeometry movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime))  = hitMovingSphere movingSphere
+hit (HittableList hittableList) = hitList hittableList
 
-makeBoundingBox movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime sphereRadius sphereMaterial fromTime untilTime) = sphereMakeBoundingBox movingSphere
-makeBoundingBox sphere@(Sphere sphereCenter sphereRadius sphereMaterial) = movingSphereMakeBoundBox sphere
+makeBoundingBox (HittableGeometry 
+                                movingSphere@(MovingSphere sphereCenterInitially sphereCenterAfterTime 
+                                                            sphereRadius sphereMaterial fromTime untilTime)) = sphereMakeBoundingBox movingSphere
 
+makeBoundingBox (HittableGeometry 
+                                sphere@(Sphere sphereCenter sphereRadius sphereMaterial)) = movingSphereMakeBoundBox sphere
+
+
+makeBoundingBox (HittableList hittableList) = hitListBoundingBox hittableList
 
 hitList hittableList ray@(Ray rayOrigin rayDirection _) tMin tMax hitRecord =
     hitHelper hittableList tMax hitRecord False
@@ -42,7 +47,7 @@ hitListBoundingBox hittableList fromInterval toInterval currentBox =
         -- the list is empty from the get go
         hitListBoundingBoxHelper [] _ _ resultBox False = Left resultBox
         hitListBoundingBoxHelper (currentObject : restOfList) fromInterval toInterval resultBox hasNotChangedBox =
-            let newBoundingBox = makeBoundingBox currentObject fromInterval toInterval 
+            let newBoundingBox = makeBoundingBox currentObject fromInterval toInterval resultBox 
             in case newBoundingBox of 
                 -- if constructing a bounding box for the current object has failed return the currentBox
                 (Left _) -> Left resultBox
@@ -55,11 +60,11 @@ groundMaterial = LambertianMaterial $ Vector 0.5 0.5 0.5
 
 generateRandomScene xIndex maxXIndex yIndex maxYIndex result 
     | xIndex == maxXIndex && yIndex == maxYIndex - 1 = 
-        wrapInIO $ 
-                (Sphere (Vector 0 (-1000) 0) 1000 groundMaterial) :
-                (Sphere (Vector 0 1 0) 1 $ Dielectric 1.5) : 
-                (Sphere (Vector (-4) 1 0) 1 $ LambertianMaterial $ Vector 0.4 0.2 0.1) : 
-                (Sphere (Vector 4 1 0) 1 $ Metal (Vector 0.7 0.6 0.5) 0) : (reverse result)
+        wrapInIO $ HittableList $ 
+                (HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 groundMaterial) :
+                (HittableGeometry $ Sphere (Vector 0 1 0) 1 $ Dielectric 1.5) : 
+                (HittableGeometry $ Sphere (Vector (-4) 1 0) 1 $ LambertianMaterial $ Vector 0.4 0.2 0.1) : 
+                (HittableGeometry $ Sphere (Vector 4 1 0) 1 $ Metal (Vector 0.7 0.6 0.5) 0) : (reverse result)
     | xIndex == maxXIndex = generateRandomScene (0) maxXIndex (yIndex + 1) maxYIndex result
     | otherwise = 
         do 
@@ -81,9 +86,11 @@ generateRandomScene xIndex maxXIndex yIndex maxYIndex result
                                  -- lambertian  
                                     | (materialCoefficient < 0.8) = 
                                         generateRandomScene (xIndex + 1) maxXIndex yIndex maxYIndex 
-                                            ((MovingSphere pointCenter centerAfterMoving 0.2 (LambertianMaterial $ randomVectorColour * randomVectorColour2) 0 1) : result) 
+                                            ((HittableGeometry $ MovingSphere pointCenter centerAfterMoving 0.2 
+                                                                (LambertianMaterial $ randomVectorColour * randomVectorColour2) 0 1) : result) 
                                 -- metal
-                                    | (materialCoefficient < 0.95) =  generateRandomScene (xIndex + 1) maxXIndex yIndex maxYIndex ((Sphere pointCenter 0.2 $ Metal metalColour metalFuzziness) 
-                                        : result)
-                                    | otherwise = generateRandomScene (xIndex + 1) maxXIndex yIndex maxYIndex ((Sphere pointCenter 0.2 $ Dielectric 1.5) : result)
+                                    | (materialCoefficient < 0.95) =  generateRandomScene (xIndex + 1) maxXIndex yIndex maxYIndex 
+                                        ((HittableGeometry $ Sphere pointCenter 0.2 $ Metal metalColour metalFuzziness) : result)
+                                    | otherwise = generateRandomScene (xIndex + 1) maxXIndex yIndex maxYIndex 
+                                        ((HittableGeometry $ Sphere pointCenter 0.2 $ Dielectric 1.5) : result)
                            

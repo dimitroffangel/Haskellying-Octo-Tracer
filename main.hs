@@ -50,9 +50,10 @@ transformEitherToIO (Right a) = return a
 transformEitherToIO (Left a) = return a
 
 -- linearly blends white and blue depending on y cooridnate of the unit vector of the ray direction
+rayColour :: (Eq a, Num a) => Ray -> HittableObject -> a -> IO Vector
 rayColour ray@(Ray origin direction _) worldObjects 0 = wrapInIO $ Vector 0 0 0
 rayColour ray@(Ray origin direction _) worldObjects depth =
-    let hitResult = hitList worldObjects ray 0.001 infinity emptyHitRecord
+    let hitResult = hit worldObjects ray 0.001 infinity emptyHitRecord
         in case hitResult of 
             (Right hit) -> 
                 do 

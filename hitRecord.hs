@@ -40,7 +40,6 @@ setFaceNormal (HitRecord point _ material t frontFace) (Ray origin direction ray
                 else HitRecord point (-outwardNormal) material t newFrontFace
 
 
-
 getScatteredRay lambMaterial@(LambertianMaterial _) hit incomingRay@(Ray origin direction rayTime) unitSphereVector randomNumber
     | isVectorNearZero unitSphereVector = getScatteredRay lambMaterial hit incomingRay (Vector 0 0 0) randomNumber
     | otherwise = Right $ Ray (point hit) (normalVector hit + unitSphereVector) rayTime
