@@ -25,6 +25,32 @@ makePerlinNoise (PerlinShader randomNumbers permX permY permZ) point@(Vector x y
         k = ((.&.) (ceiling (4 * z)) 255) :: Int
         in randomNumbers !! ((permX !! i) `xor` (permY !! j) `xor` (permZ !! k))
 
+trilinearInterpolationXSize = 2
+trilinearInterpolationYSize = 2
+trilinearInterpolationZSize = 2
+
+makePerlinNoiseWithTrilnearInterpolation (PerlinShader randomNumbers permX permY permZ) point@(Vector x y z) =
+    let 
+        u = x - (realToFrac (floor x))
+        v = y - (realToFrac (floor y))
+        w = z - (realToFrac (floor z))
+        i = floor x
+        j = floor y
+        k = floor z
+        dataForTrilinearInterpolation = 
+            [
+                [
+                    [
+                         randomNumbers !! (  (permX !! ((.&.) (i + a) 255)) `xor`
+                                            (permY !! ((.&.) (j + b) 255)) `xor` 
+                                            (permZ !! ((.&.) (k + c) 255))) | a <- [0..trilinearInterpolationXSize]
+                    ]
+                    | b <- [0..trilinearInterpolationYSize]
+                ] | c <- [0..trilinearInterpolationZSize]
+            ]
+            in 42
+        -- in trilinearInterpolation dataForTrilinearInterpolation u v w
+
 pointCounter = 256
 
 perlinGeneratePermutation listOfRandoms = 

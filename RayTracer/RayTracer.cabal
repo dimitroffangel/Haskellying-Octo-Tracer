@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 870b4066209391aec87aef67b095c48b2915615b1d12c7ff90a4c7fd8316c60c
+-- hash: e7c6ad053a951e4a78853974b0e1fb1db2b9e96d5559be9c35b869a23542303e
 
 name:           RayTracer
 version:        0.1.0.0
@@ -27,13 +27,30 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      AxisAlignedBoundingBox
+      BVH
+      Camera
+      GeneratingRandomStuff
+      HitRecord
+      Hittable
+      HittableTypes
+      IO
+      MovingSphere
+      PerlinShade
+      Ray
+      Sphere
+      Texture
+      UtilityFunctions
+      Vector
+      XYRect
   other-modules:
       Paths_RayTracer
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      HUnit
+    , base >=4.7 && <5
+    , random
   default-language: Haskell2010
 
 executable RayTracer-exe
@@ -44,8 +61,10 @@ executable RayTracer-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      RayTracer
+      HUnit
+    , RayTracer
     , base >=4.7 && <5
+    , random
   default-language: Haskell2010
 
 test-suite RayTracer-test
@@ -57,6 +76,8 @@ test-suite RayTracer-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      RayTracer
+      HUnit
+    , RayTracer
     , base >=4.7 && <5
+    , random
   default-language: Haskell2010
