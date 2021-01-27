@@ -29,14 +29,13 @@ pointCounter = 256
 
 perlinGeneratePermutation listOfRandoms = 
     let array = [x | x <- [0 .. (pointCounter - 1)]]
-    in perlinPermutate (pointCounter - 1) array listOfRandoms
+    in perlinPermutate (pointCounter - 1) listOfRandoms array 
 
-perlinPermutate index (currentRandomNumber : restOfRandoms) result
-    | index == -1 = result
-    | otherwise = 
+perlinPermutate _ [] result = result
+perlinPermutate index (currentRandomNumber : restOfRandoms) result =
             let 
                 temp = result !! index
-                target = result !! currentRandomNumber
+                target = currentRandomNumber
                 newResult = (take (index - 1) result) ++ (target : (drop index result))
                 finalResult = (take (target - 1) newResult) ++ (temp : (drop target newResult))
-                in perlinPermutate (index - 1) finalResult restOfRandoms
+                in perlinPermutate (index - 1)  restOfRandoms finalResult

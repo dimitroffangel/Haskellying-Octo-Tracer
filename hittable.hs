@@ -148,13 +148,13 @@ generateThirdScene =
                                                     giveRandomNumbersForNoiseX1 
                                                     giveRandomNumbersForNoiseY1 
                                                     giveRandomNumbersForNoiseZ1                            
-            pertexMaterial2 = constructPerlinShader giveRandomNumbersForNoise2 
-                                                    giveRandomNumbersForNoiseX2 
-                                                    giveRandomNumbersForNoiseY2 
-                                                    giveRandomNumbersForNoiseZ2
+            -- pertexMaterial2 = constructPerlinShader giveRandomNumbersForNoise2 
+            --                                         giveRandomNumbersForNoiseX2 
+            --                                         giveRandomNumbersForNoiseY2 
+            --                                         giveRandomNumbersForNoiseZ2
             in return $ HittableList $ [
                     (HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ NoiseTexture $ Noise $ pertexMaterial1)),
-                    (HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ NoiseTexture $ Noise pertexMaterial2))
+                    (HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ NoiseTexture $ Noise pertexMaterial1))
                 ]            
             
 fooMaterial = DiffuseLight $ SolidColourTexture $ SolidColour $ Vector 4 4 4

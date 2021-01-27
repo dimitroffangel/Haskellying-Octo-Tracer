@@ -30,6 +30,7 @@ background3 = Vector 0.7 0.8 1
 
 randomScene = generateRandomScene (0) 4 (0) 4 []
 sceneWithTextureOfSinusAndCosinus = generateSecondScene 
+sceneWithPerlinShader = generateThirdScene
 simpleDiffuseTextureTest = sceneWithSimpleLight
 
 depthOfFieldLookFrom = Vector (3) 3 2 
@@ -43,18 +44,18 @@ depthOfFieldOfViewMainCamera = constructCamera depthOfFieldVerticalOfView depthO
                                                 depthOfFieldLookFrom depthOfFieldLookAt depthOfFieldViewUp 0 1
 
 
-lookFrom = Vector 26 3  6
--- lookFrom = Vector 13 2 3
--- lookAt = Vector 0 0 (0)
-lookAt = Vector 0 2 0
+-- lookFrom = Vector 26 3  6
+lookFrom = Vector 13 2 3
+lookAt = Vector 0 0 (0)
+-- lookAt = Vector 0 2 0
 viewUp = Vector 0 1 0
 distToFocus = 10
 aperture = 0.1
 
 -- mainCamera = constructCamera 90 aspectRatio (Vector (-2) 2 1) (Vector 0 0 (-1)) (Vector 0 1 0)
 -- mainCamera = constructCamera 20 aspectRatio (Vector (-2) 2 1) (Vector 0 0 (-1)) (Vector 0 1 0)
--- mainCamera = constructCamera 20 aspectRatio aperture distToFocus lookFrom lookAt viewUp 0 1
-mainCamera = depthOfFieldOfViewMainCamera
+mainCamera = constructCamera 20 aspectRatio aperture distToFocus lookFrom lookAt viewUp 0 1
+-- mainCamera = depthOfFieldOfViewMainCamera
 
 maxDepth = 10
 
@@ -111,5 +112,5 @@ testingPicture currentWidth currentHeight result world background
 
 runTest = 
     do 
-        getWorld <- randomScene
+        getWorld <- sceneWithPerlinShader
         saveImage (testingPicture 0 (imageHeight -1) [] getWorld background1) "./foo.ppm"
