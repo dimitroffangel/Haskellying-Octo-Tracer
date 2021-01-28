@@ -182,8 +182,8 @@ generateThirdSceneWithTrilinearInterpolation =
             --                                         giveRandomNumbersForNoiseY2 
             --                                         giveRandomNumbersForNoiseZ2
             in return $ HittableList [
-                    HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ TrilinearNoiseTexture $ TrilinearNoise pertexMaterial1 4),
-                    HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ TrilinearNoiseTexture $ TrilinearNoise pertexMaterial1 4)
+                    HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ MarbleTexture $ TrilinearNoise pertexMaterial1 4),
+                    HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ MarbleTexture $ TrilinearNoise pertexMaterial1 4)
                 ]            
             
 
