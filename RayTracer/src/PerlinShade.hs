@@ -31,9 +31,9 @@ trilinearInterpolationZSize = 2
 
 makePerlinNoiseWithTrilnearInterpolation (PerlinShader randomNumbers permX permY permZ) point@(Vector x y z) =
     let 
-        u = x - (realToFrac (floor x))
-        v = y - (realToFrac (floor y))
-        w = z - (realToFrac (floor z))
+        u = x - realToFrac (floor x)
+        v = y - realToFrac (floor y)
+        w = z - realToFrac (floor z)
         i = floor x
         j = floor y
         k = floor z
@@ -41,15 +41,29 @@ makePerlinNoiseWithTrilnearInterpolation (PerlinShader randomNumbers permX permY
             [
                 [
                     [
-                         randomNumbers !! (  (permX !! ((.&.) (i + a) 255)) `xor`
-                                            (permY !! ((.&.) (j + b) 255)) `xor` 
-                                            (permZ !! ((.&.) (k + c) 255))) | a <- [0..trilinearInterpolationXSize]
+                         randomNumbers !! (  (permX !! (.&.) (i + c) 255) `xor`
+                                            (permY !! (.&.) (j + b) 255) `xor` 
+                                            (permZ !! (.&.) (k + a) 255)) | a <- [0..trilinearInterpolationXSize]
                     ]
                     | b <- [0..trilinearInterpolationYSize]
                 ] | c <- [0..trilinearInterpolationZSize]
             ]
-            in 42
-        -- in trilinearInterpolation dataForTrilinearInterpolation u v w
+        in trilinearInterpolation dataForTrilinearInterpolation u v w
+
+
+trilinearInterpolation list u v w =
+    trilinearInterpolationHelper 0 0 0 list u v w 0
+    where 
+        trilinearInterpolationHelper zIndex yIndex xIndex list u v w result
+            | xIndex == trilinearInterpolationXSize = trilinearInterpolationHelper zIndex (yIndex + 1) 0 list u v w result
+            | yIndex == trilinearInterpolationYSize = trilinearInterpolationHelper (zIndex + 1) 0 0 list u v w result
+            | zIndex == trilinearInterpolationZSize = result
+            | otherwise = trilinearInterpolationHelper zIndex yIndex (xIndex + 1) list u v w 
+                $ result + 
+                    (realToFrac zIndex *u + (1- realToFrac zIndex)*(1-u)) * 
+                    (realToFrac yIndex *v+ (1- realToFrac yIndex)*(1-v)) * 
+                    (realToFrac xIndex *w+ (1- realToFrac xIndex)*(1-w)) * (((list !! zIndex) !! yIndex) !! xIndex) 
+
 
 pointCounter = 256
 

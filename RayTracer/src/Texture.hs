@@ -4,9 +4,12 @@ import Vector
 import PerlinShade
 
 data Texture = 
-    SolidColourTexture (SolidColour) 
+    SolidColourTexture SolidColour 
     | 
-    NoiseTexture (Noise) |
+    NoiseTexture Noise 
+    |
+    TrilinearNoiseTexture TrilinearNoise 
+    | 
     SimpleTexture {
         oddTexture :: Texture,
         evenTexture :: Texture  
@@ -17,9 +20,13 @@ data Texture =
 newtype SolidColour = SolidColour {textureColour :: Vector} deriving (Show, Read, Eq)
 newtype Noise = Noise {perlinShader :: PerlinShader} deriving (Show, Read, Eq)
 
+newtype TrilinearNoise = TrilinearNoise {trilinearPerlinShader :: PerlinShader} deriving (Show, Read, Eq)
+
 -- only for test currently
 getTextureValue (SolidColourTexture (SolidColour textureColour)) u v point = textureColour
 getTextureValue (NoiseTexture (Noise perlinShader)) u v point = scalarMultiplication (Vector 1 1 1) (makePerlinNoise perlinShader point)
+getTextureValue (TrilinearNoiseTexture (TrilinearNoise perlinShader)) u v point = scalarMultiplication (Vector 1 1 1) 
+    (makePerlinNoiseWithTrilnearInterpolation perlinShader point)
 getTextureValue (SimpleTexture oddTexture evenTexture) u v point@(Vector x y z) = 
     let sinusResult = (sin (10 * x)) * (sin (10 * y)) * (sin (10 * z))
     in if sinusResult < 0 

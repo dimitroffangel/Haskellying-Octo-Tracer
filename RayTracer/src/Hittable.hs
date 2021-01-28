@@ -152,11 +152,36 @@ generateThirdScene =
             --                                         giveRandomNumbersForNoiseX2 
             --                                         giveRandomNumbersForNoiseY2 
             --                                         giveRandomNumbersForNoiseZ2
-            in return $ HittableList $ [
-                    (HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ NoiseTexture $ Noise $ pertexMaterial1)),
-                    (HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ NoiseTexture $ Noise pertexMaterial1))
+            in return $ HittableList [
+                    HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ NoiseTexture $ Noise $ pertexMaterial1),
+                    HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ NoiseTexture $ Noise pertexMaterial1)
                 ]            
             
+generateThirdSceneWithTrilinearInterpolation =  
+    do
+        giveRandomNumbersForNoise1  <- generateRandomNumbersForNoise1 
+        giveRandomNumbersForNoise2  <- generateRandomNumbersForNoise2 
+        giveRandomNumbersForNoiseX1 <- generateRandomNumbersForNoiseX1
+        giveRandomNumbersForNoiseX2 <- generateRandomNumbersForNoiseX2
+        giveRandomNumbersForNoiseY1 <- generateRandomNumbersForNoiseY1
+        giveRandomNumbersForNoiseY2 <- generateRandomNumbersForNoiseY2
+        giveRandomNumbersForNoiseZ1 <- generateRandomNumbersForNoiseZ1
+        giveRandomNumbersForNoiseZ2 <- generateRandomNumbersForNoiseZ2
+        let 
+            pertexMaterial1 = constructPerlinShader giveRandomNumbersForNoise1 
+                                                    giveRandomNumbersForNoiseX1 
+                                                    giveRandomNumbersForNoiseY1 
+                                                    giveRandomNumbersForNoiseZ1                            
+            -- pertexMaterial2 = constructPerlinShader giveRandomNumbersForNoise2 
+            --                                         giveRandomNumbersForNoiseX2 
+            --                                         giveRandomNumbersForNoiseY2 
+            --                                         giveRandomNumbersForNoiseZ2
+            in return $ HittableList [
+                    HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ TrilinearNoiseTexture $ TrilinearNoise pertexMaterial1),
+                    HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ TrilinearNoiseTexture $ TrilinearNoise pertexMaterial1)
+                ]            
+            
+
 fooMaterial = DiffuseLight $ SolidColourTexture $ SolidColour $ Vector 4 4 4
 
 sceneWithSimpleLight = wrapInIO $ 

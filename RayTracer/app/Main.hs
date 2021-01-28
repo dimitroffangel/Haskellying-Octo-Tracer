@@ -13,7 +13,6 @@ import AxisAlignedBoundingBox
 import HittableTypes
 import Texture
 
-
 -- constants
 infinity = 1.79769e+308
 demoRadius = cos (pi / 4)
@@ -31,6 +30,7 @@ background3 = Vector 0.7 0.8 1
 randomScene = generateRandomScene (0) 4 (0) 4 []
 sceneWithTextureOfSinusAndCosinus = generateSecondScene 
 sceneWithPerlinShader = generateThirdScene
+sceneWithPerlinTrilinearShader = generateThirdSceneWithTrilinearInterpolation
 simpleDiffuseTextureTest = sceneWithSimpleLight
 
 depthOfFieldLookFrom = Vector (3) 3 2 
@@ -112,7 +112,8 @@ testingPicture currentWidth currentHeight result world background
 
 runTest = 
     do 
-        getWorld <- sceneWithPerlinShader
+        getWorld <- sceneWithPerlinTrilinearShader
         saveImage (testingPicture 0 (imageHeight -1) [] getWorld background1) "./foo.ppm"
+
 
 main = runTest
