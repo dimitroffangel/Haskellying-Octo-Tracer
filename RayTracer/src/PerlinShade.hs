@@ -34,6 +34,9 @@ makePerlinNoiseWithTrilnearInterpolation (PerlinShader randomNumbers permX permY
         u = x - realToFrac (floor x)
         v = y - realToFrac (floor y)
         w = z - realToFrac (floor z)
+        hermitianU = u*u*(3 - 2*u)
+        hermitianV = v*v*(3 - 2*v)
+        hermitianW = w*w*(3 - 2*w)
         i = floor x
         j = floor y
         k = floor z
@@ -48,7 +51,7 @@ makePerlinNoiseWithTrilnearInterpolation (PerlinShader randomNumbers permX permY
                     | b <- [0..trilinearInterpolationYSize]
                 ] | c <- [0..trilinearInterpolationZSize]
             ]
-        in trilinearInterpolation dataForTrilinearInterpolation u v w
+        in trilinearInterpolation dataForTrilinearInterpolation hermitianU hermitianV hermitianW
 
 
 trilinearInterpolation list u v w =
