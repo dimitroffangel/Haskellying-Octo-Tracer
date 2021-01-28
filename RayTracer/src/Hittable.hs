@@ -115,6 +115,7 @@ generateSecondScene =  wrapInIO $
                                                 ]
 
 
+generateRandomUnitVecctorsForNoise1 = transformListOfIOToIOOfList [ getUnitVector <$> getRandomVectorInInterval (-1) 1 | x <- [1..pointCounter]]
 generateRandomNumbersForNoise1 =  transformListOfIOToIOOfList [ (generateNumberInInterval 0 1) | x <- [1..pointCounter]]
 generateRandomNumbersForNoise2 =  transformListOfIOToIOOfList [ (generateNumberInInterval 0 1) | x <- [1..pointCounter]]
 generateRandomNumbersForNoiseX1 = transformListOfIOToIOOfList  [(generateIntegerInInterval 0 (pointCounter - x)) | x <- [1..pointCounter]]
@@ -135,6 +136,7 @@ transformListOfIOToIOOfList list=
 
 generateThirdScene =  
     do
+        giveRandomUnitVectosForNoise1 <- generateRandomUnitVecctorsForNoise1
         giveRandomNumbersForNoise1  <- generateRandomNumbersForNoise1 
         giveRandomNumbersForNoise2  <- generateRandomNumbersForNoise2 
         giveRandomNumbersForNoiseX1 <- generateRandomNumbersForNoiseX1
@@ -144,7 +146,8 @@ generateThirdScene =
         giveRandomNumbersForNoiseZ1 <- generateRandomNumbersForNoiseZ1
         giveRandomNumbersForNoiseZ2 <- generateRandomNumbersForNoiseZ2
         let 
-            pertexMaterial1 = constructPerlinShader giveRandomNumbersForNoise1 
+            pertexMaterial1 = constructPerlinShader giveRandomUnitVectosForNoise1
+                                                    giveRandomNumbersForNoise1 
                                                     giveRandomNumbersForNoiseX1 
                                                     giveRandomNumbersForNoiseY1 
                                                     giveRandomNumbersForNoiseZ1                            
@@ -159,6 +162,7 @@ generateThirdScene =
             
 generateThirdSceneWithTrilinearInterpolation =  
     do
+        giveRandomUnitVectosForNoise1 <- generateRandomUnitVecctorsForNoise1
         giveRandomNumbersForNoise1  <- generateRandomNumbersForNoise1 
         giveRandomNumbersForNoise2  <- generateRandomNumbersForNoise2 
         giveRandomNumbersForNoiseX1 <- generateRandomNumbersForNoiseX1
@@ -168,7 +172,8 @@ generateThirdSceneWithTrilinearInterpolation =
         giveRandomNumbersForNoiseZ1 <- generateRandomNumbersForNoiseZ1
         giveRandomNumbersForNoiseZ2 <- generateRandomNumbersForNoiseZ2
         let 
-            pertexMaterial1 = constructPerlinShader giveRandomNumbersForNoise1 
+            pertexMaterial1 = constructPerlinShader giveRandomUnitVectosForNoise1
+                                                    giveRandomNumbersForNoise1 
                                                     giveRandomNumbersForNoiseX1 
                                                     giveRandomNumbersForNoiseY1 
                                                     giveRandomNumbersForNoiseZ1                            
@@ -177,8 +182,8 @@ generateThirdSceneWithTrilinearInterpolation =
             --                                         giveRandomNumbersForNoiseY2 
             --                                         giveRandomNumbersForNoiseZ2
             in return $ HittableList [
-                    HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ TrilinearNoiseTexture $ TrilinearNoise pertexMaterial1),
-                    HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ TrilinearNoiseTexture $ TrilinearNoise pertexMaterial1)
+                    HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ TrilinearNoiseTexture $ TrilinearNoise pertexMaterial1 4),
+                    HittableGeometry $ Sphere (Vector 0 2 0) 2 (LambertianMaterial $ TrilinearNoiseTexture $ TrilinearNoise pertexMaterial1 4)
                 ]            
             
 
