@@ -28,7 +28,13 @@ makePerlinNoise (PerlinShader _ randomNumbers permX permY permZ) point@(Vector x
         k = ((.&.) (ceiling (4 * z)) 255) :: Int
         in randomNumbers !! ((permX !! i) `xor` (permY !! j) `xor` (permZ !! k))
 
--- createTurbulence (PerlinShader randomNumbers permX permY permZ) point@(Vector x y z) = []
+createTurbulence perlinShader@(PerlinShader randomVectors randomNumbers permX permY permZ) point@(Vector x y z) depth = 
+    turbulenceHelper 0 perlinShader point 0  1 point
+    where 
+        turbulenceHelper index perlinShader point result weight tempPoint
+            | index == depth = abs result
+            |otherwise = turbulenceHelper (index + 1) perlinShader point 
+                (result + weight* makePerlinNoiseWithTrilnearInterpolation perlinShader tempPoint) (weight * 0.5) (scalarMultiplication point 2)
 
 trilinearInterpolationXSize = 2
 trilinearInterpolationYSize = 2
