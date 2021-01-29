@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e7c6ad053a951e4a78853974b0e1fb1db2b9e96d5559be9c35b869a23542303e
+-- hash: 9e833e40a46adad8fbeb69be68a8cebebbad87837bdac5f78db37a4709af9848
 
 name:           RayTracer
 version:        0.1.0.0
@@ -50,6 +50,7 @@ library
   build-depends:
       HUnit
     , base >=4.7 && <5
+    , hip
     , random
   default-language: Haskell2010
 
@@ -64,6 +65,7 @@ executable RayTracer-exe
       HUnit
     , RayTracer
     , base >=4.7 && <5
+    , hip
     , random
   default-language: Haskell2010
 
@@ -79,5 +81,6 @@ test-suite RayTracer-test
       HUnit
     , RayTracer
     , base >=4.7 && <5
+    , hip
     , random
   default-language: Haskell2010

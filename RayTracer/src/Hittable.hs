@@ -12,6 +12,17 @@ import AxisAlignedBoundingBox
 import Texture
 import PerlinShade
 import XYRect
+import IO
+
+import Data.Word
+
+import qualified Graphics.Image as I
+import Graphics.Image.Processing (rotate180)
+import qualified Graphics.Image.Interface as IM
+import qualified Graphics.Image.Interface.Repa as R
+import Graphics.Image.ColorSpace
+import Graphics.Image.Types
+
 
 
 clear hittableList = []
@@ -188,6 +199,26 @@ generateThirdSceneWithTrilinearInterpolation =
             
 
 fooMaterial = DiffuseLight $ SolidColourTexture $ SolidColour $ Vector 4 4 4
+
+frog = I.readImage "./simple.jpg" :: IO (Either String (I.Image VS RGB Double))
+
+fooFunc = 
+    do 
+        testFrog <- I.readImage "./earthmap.jpg" :: IO (Either String (I.Image VS RGB Double))
+        case testFrog of 
+            (Left err)-> return $ Image 0 0 [[Vector 1 2 3]]
+            (Right res)-> 
+                let rgbList = I.toLists res
+                    in return $ Image (I.cols res) (I.rows res) $ map (\row -> map (\(PixelRGB a b c) -> Vector a b c) row) rgbList
+
+
+sceneWithTextureImage = 
+    do 
+        image <- fooFunc 
+        return $ HittableList  
+            [
+               HittableGeometry $ Sphere (Vector 0 0 0) 2 $ LambertianMaterial $ ImageTexture (content image) (width image) (height image)
+            ]
 
 sceneWithSimpleLight = wrapInIO $ 
         HittableList $

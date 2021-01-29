@@ -13,6 +13,14 @@ import AxisAlignedBoundingBox
 import HittableTypes
 import Texture
 
+-- rotateCat0 = do
+--   cat <- I.readImageRGB "./simple.jpg"
+--   return cat
+
+-- grad_color = I.makeImageR VU (200, 200) (\(i, j) -> PixelRGB (fromIntegral i) (fromIntegral j) (fromIntegral (i + j))) / 400
+-- test = I.writeImage "images/grad_color.png" grad_color
+
+
 -- constants
 infinity = 1.79769e+308
 demoRadius = cos (pi / 4)
@@ -112,8 +120,14 @@ testingPicture currentWidth currentHeight result world background
 
 runTest = 
     do 
-        getWorld <- sceneWithPerlinTrilinearShader
+        getWorld <- sceneWithTextureImage
         saveImage (testingPicture 0 (imageHeight -1) [] getWorld background1) "./foo.ppm"
 
 
 main = runTest
+
+
+-- fooFunc =
+--     do
+--         coolImage <- readImage "./coolImage.jpg" :: IO (Either String (Graphics.Image.Image VS RGB Word8))
+--         return $ displayImage coolImage
