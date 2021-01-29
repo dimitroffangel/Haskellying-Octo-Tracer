@@ -204,7 +204,7 @@ frog = I.readImage "./simple.jpg" :: IO (Either String (I.Image VS RGB Double))
 
 fooFunc = 
     do 
-        testFrog <- I.readImage "./earthmap.jpg" :: IO (Either String (I.Image VS RGB Double))
+        testFrog <- I.readImage "./gadetBot.png" :: IO (Either String (I.Image VS RGB Double))
         case testFrog of 
             (Left err)-> return $ Image 0 0 [[Vector 1 2 3]]
             (Right res)-> 
@@ -217,14 +217,37 @@ sceneWithTextureImage =
         image <- fooFunc 
         return $ HittableList  
             [
-               HittableGeometry $ Sphere (Vector 0 0 0) 2 $ LambertianMaterial $ ImageTexture (content image) (width image) (height image)
+               HittableGeometry $ Sphere (Vector 0 0 0) 0.5 $ LambertianMaterial $ ImageTexture (content image) (width image) (height image)
             ]
 
-sceneWithSimpleLight = wrapInIO $ 
-        HittableList $
-            (HittableGeometry $ Sphere (Vector 0 7 0) 2 fooMaterial) :
-            (XYRectHittable $ XYRect 3 5 1 3 (-2) fooMaterial)  : 
-            [
-                (HittableGeometry $ Sphere (Vector 0 (2) 0) 2 (LambertianMaterial $ SolidColourTexture $ SolidColour $ Vector 0.8 0.8 0)),
-                (HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 (LambertianMaterial $ SolidColourTexture $ SolidColour $ Vector 0.8 0.8 0))
-            ] 
+sceneWithSimpleLight = 
+    do
+        giveRandomUnitVectosForNoise1 <- generateRandomUnitVecctorsForNoise1
+        giveRandomNumbersForNoise1  <- generateRandomNumbersForNoise1 
+        giveRandomNumbersForNoise2  <- generateRandomNumbersForNoise2 
+        giveRandomNumbersForNoiseX1 <- generateRandomNumbersForNoiseX1
+        giveRandomNumbersForNoiseX2 <- generateRandomNumbersForNoiseX2
+        giveRandomNumbersForNoiseY1 <- generateRandomNumbersForNoiseY1
+        giveRandomNumbersForNoiseY2 <- generateRandomNumbersForNoiseY2
+        giveRandomNumbersForNoiseZ1 <- generateRandomNumbersForNoiseZ1
+        giveRandomNumbersForNoiseZ2 <- generateRandomNumbersForNoiseZ2
+        let 
+            pertexMaterial1 = constructPerlinShader giveRandomUnitVectosForNoise1
+                                                    giveRandomNumbersForNoise1 
+                                                    giveRandomNumbersForNoiseX1 
+                                                    giveRandomNumbersForNoiseY1 
+                                                    giveRandomNumbersForNoiseZ1                            
+            -- pertexMaterial2 = constructPerlinShader giveRandomNumbersForNoise2 
+            --                                         giveRandomNumbersForNoiseX2 
+            --                                         giveRandomNumbersForNoiseY2 
+            --                                         giveRandomNumbersForNoiseZ2
+            in return $ 
+                    HittableList $
+                        (HittableGeometry $ Sphere (Vector 0 7 0) 2 fooMaterial) :
+                        (XYRectHittable $ XYRect 3 5 1 3 (-2) fooMaterial)  : 
+                        [
+                            (HittableGeometry $ Sphere (Vector 0 (2) 0) 2 
+                                (LambertianMaterial $ MarbleTexture $ TrilinearNoise pertexMaterial1 4)),
+                            (HittableGeometry $ Sphere (Vector 0 (-1000) 0) 1000 
+                                (LambertianMaterial $ MarbleTexture $ TrilinearNoise pertexMaterial1 4))
+                        ] 

@@ -26,13 +26,25 @@ data BVH = BVH {
 } deriving (Show, Read, Eq)
 
 data XYRect = XYRect{
-    x0 :: Double,
-    x1 :: Double,
-    y0 :: Double,
-    y1 :: Double,
-    xyRectZ :: Double,
-    xyRectMaterial :: Material
+    getXYRectx0 :: Double,
+    getXYRectx1 :: Double,
+    getXYRecty0 :: Double,
+    getXYRecty1 :: Double,
+    getXYRectXYRectZ :: Double,
+    getXYRectXYRectMaterial :: Material
 } deriving (Show, Read, Eq)
+
+data XZRect = XZRect{
+    getXZRectx0 :: Double,
+    getXZRectx1 :: Double,
+    getXZRectz0 :: Double,
+    getXZRectz1 :: Double,
+    getXZRectY :: Double,
+    getXZRectMaterial :: Material
+} deriving (Show, Read, Eq)
+
+
+thinBorderDistance = 0.0001
 
 -- newtype HittableList = HittableList [GeometryObject]
 
@@ -43,7 +55,8 @@ data HittableObject =
         list :: [HittableObject]
     } 
     | BVHHittable (BVH) 
-    | XYRectHittable (XYRect)
+    | XYRectHittable (XYRect) 
+    | XZRectHittable (XZRect)
     deriving (Show, Read, Eq)
 
 

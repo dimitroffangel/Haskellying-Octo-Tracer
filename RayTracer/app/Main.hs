@@ -52,10 +52,10 @@ depthOfFieldOfViewMainCamera = constructCamera depthOfFieldVerticalOfView depthO
                                                 depthOfFieldLookFrom depthOfFieldLookAt depthOfFieldViewUp 0 1
 
 
--- lookFrom = Vector 26 3  6
-lookFrom = Vector 13 2 3
-lookAt = Vector 0 0 (0)
--- lookAt = Vector 0 2 0
+lookFrom = Vector 26 3  6
+-- lookFrom = Vector 13 2 3
+-- lookAt = Vector 0 0 (0)
+lookAt = Vector 0 2 0
 viewUp = Vector 0 1 0
 distToFocus = 10
 aperture = 0.1
@@ -120,8 +120,8 @@ testingPicture currentWidth currentHeight result world background
 
 runTest = 
     do 
-        getWorld <- sceneWithTextureImage
-        saveImage (testingPicture 0 (imageHeight -1) [] getWorld background1) "./foo.ppm"
+        getWorld <- sceneWithSimpleLight
+        saveImage (testingPicture 0 (imageHeight -1) [] getWorld background0) "./foo.ppm"
 
 
 main = runTest

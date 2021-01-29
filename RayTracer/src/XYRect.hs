@@ -6,7 +6,6 @@ import Ray
 import Vector
 import HittableTypes
 
-thinBorderDistance = 0.0001
 
 xyRectBoundingBox (XYRect x0 x1 y0 y1 z _) fromInterval toInterval result =
     Right $ AABB (Vector x0 y0 $ z - thinBorderDistance) $ Vector x1 y1 $ z + thinBorderDistance
