@@ -43,6 +43,15 @@ data XZRect = XZRect{
     getXZRectMaterial :: Material
 } deriving (Show, Read, Eq)
 
+data YZRect = YZRect{
+    getYZRecty0 :: Double,
+    getYZRecty1 :: Double,
+    getYZRectz0 :: Double,
+    getYZRectz1 :: Double,
+    getYZRectX :: Double,
+    getYZRectMaterial :: Material
+} deriving (Show, Read, Eq)
+
 
 thinBorderDistance = 0.0001
 
@@ -57,6 +66,7 @@ data HittableObject =
     | BVHHittable (BVH) 
     | XYRectHittable (XYRect) 
     | XZRectHittable (XZRect)
+    | YZRectHittable (YZRect)
     deriving (Show, Read, Eq)
 
 
