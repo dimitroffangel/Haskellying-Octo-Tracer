@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 77c1b8cf6a8ad9d30f4febfd5d10c766cc5a904fc671a7fc042c0b9aca724440
+-- hash: 25e480b6aca6d6d7a5e86a07e6edc946c0b25dbfb63244a034af0657c8acf493
 
 name:           RayTracer
 version:        0.1.0.0
@@ -44,6 +44,7 @@ library
       Vector
       XYRect
       XZRect
+      YZRect
   other-modules:
       Paths_RayTracer
   hs-source-dirs:
