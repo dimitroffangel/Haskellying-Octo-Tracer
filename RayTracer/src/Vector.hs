@@ -65,9 +65,22 @@ epsilon = 1e-8
 
 isVectorNearZero (Vector x y z) = x < epsilon && y < epsilon && z < epsilon 
 
+
+-- the incoming ray - twice the normal * dotProduct incomingRay normalVector for the direction of the reflection 
+-- minus because the ray points in
 reflect :: Vector -> Vector -> Vector
 reflect incomingRay normalVector = incomingRay - (scalarMultiplication normalVector $ 2 * dotProduct incomingRay normalVector)
 
+
+
+-- sintheta1 * refractiveIndex1 = sintheta2 * refractiveIndex2 
+-- <=> sinetheta2 = sintheta1 * refractiveIndex1 / refractiveIndex2
+-- R' refracted ray
+-- theta the angle betwen R' and the normal  (between 0, 180 )
+-- R' = RPerpendicularToN  + RAllongsideN 
+-- RPerpendicular = refractiveIndex1 / refractiveIndex2 * (R + cosTheta*N)
+--  RAllongsideN = - sqrt(1 - |RPerpendicular^2|) * N
+-- cosTheta = crossProduct RefractedRay N
 refract uv  normal etaOverEtaPrim =
     let cosTheta = min (dotProduct (-uv) normal) 1
         refractedRayPerpendicular = scalarMultiplication (uv + scalarMultiplication normal cosTheta) etaOverEtaPrim

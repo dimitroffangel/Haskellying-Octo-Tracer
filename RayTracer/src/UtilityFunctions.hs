@@ -2,6 +2,7 @@ module UtilityFunctions where
 
 -- utility stuff
 degreesToRadians degrees = (degrees * pi) / 180
+infinity = 1.79769e+308
 
 clamp x min max 
     | x < min = min

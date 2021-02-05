@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 25e480b6aca6d6d7a5e86a07e6edc946c0b25dbfb63244a034af0657c8acf493
+-- hash: 6ef254401d629627785cd77cc2e76f9976540c0e3048609ad58a4a04b02f5522
 
 name:           RayTracer
 version:        0.1.0.0
@@ -28,8 +28,10 @@ source-repository head
 library
   exposed-modules:
       AxisAlignedBoundingBox
+      Box
       BVH
       Camera
+      ConstantMedium
       GeneratingRandomStuff
       HitRecord
       Hittable
@@ -38,8 +40,10 @@ library
       MovingSphere
       PerlinShade
       Ray
+      RotateAroundY
       Sphere
       Texture
+      Translation
       UtilityFunctions
       Vector
       XYRect

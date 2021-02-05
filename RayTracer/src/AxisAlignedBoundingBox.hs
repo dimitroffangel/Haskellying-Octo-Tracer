@@ -11,6 +11,12 @@ data AABB = AABB {
 constructAABB pointA pointB = AABB pointA pointB
 
 
+
+-- x0 < x1
+-- x0 = A + t0b
+-- x1 = A + t1b
+-- t0 < t1
+-- hitAABB -> get the minimum and maximum t on each axis and see if the ray is between each of them
 hitAABB (AABB (Vector xMinimum yMinimum zMinimum) (Vector xMaximum yMaximum zMaximum)) 
         (Ray (Vector xOrigin yOrigin zOrigin) (Vector xDirection yDirection zDirection) _) tMin tMax = 
     hitHelper xDirection xMinimum xOrigin xMaximum tMin tMax &&   

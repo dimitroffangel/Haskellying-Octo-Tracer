@@ -56,7 +56,6 @@ getTextureValue imageTexture@(ImageTexture imageData imageWidth imageHeight) u v
                     in Vector x y z
                     -- in Vector (colourScale * x) (colourScale * y) (colourScale * z)
 
-
 getTextureValue (SimpleTexture oddTexture evenTexture) u v point@(Vector x y z) = 
     let sinusResult = (sin (10 * x)) * (sin (10 * y)) * (sin (10 * z))
     in if sinusResult < 0 

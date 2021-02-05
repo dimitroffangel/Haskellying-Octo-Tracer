@@ -7,7 +7,7 @@ import UtilityFunctions
 -- image info
 aspectRatio = 16 / 9
 imageWidth :: Int
-imageWidth = 400
+imageWidth = 600
 imageHeight :: Int
 imageHeight = floor $ realToFrac imageWidth / aspectRatio
 
@@ -31,7 +31,8 @@ getRay s t camera unitDiskVector randomInitialStartOfCasting =
         radiusVector@(Vector xRadiusVector yRadiusVector zRadiusVector) = scalarMultiplication unitDiskVector (cameraLensRadius camera)
         offset = scalarMultiplication (cameraRelativeU camera) xRadiusVector + scalarMultiplication (cameraRelativeV camera) yRadiusVector
     in  Ray (cameraOrigin camera + offset)
-        ((cameraLowerLeftCorner camera) + scalarMultiplication (cameraHorizontal camera) s + scalarMultiplication (cameraVertical camera) t - (cameraOrigin camera) - offset)
+        ((cameraLowerLeftCorner camera) + scalarMultiplication (cameraHorizontal camera) s + scalarMultiplication (cameraVertical camera) t - 
+        (cameraOrigin camera) - offset)
         $ randomInitialStartOfCasting
 
 data Camera = Camera {
@@ -51,6 +52,9 @@ data Camera = Camera {
     sendRayUntilTime :: Double
 } deriving (Show, Read, Eq)
 
+
+-- aperture -> tool to control the lense with wich the depth of field is made
+-- focusDist -> the distance from the lense to the projection plane
 constructCamera verticalFieldOfView aspectRatio aperture focusDist lookFrom lookAt viewUp sendRayFromTime sendRayUntilTime =
     let theta = degreesToRadians verticalFieldOfView
         height = tan(theta / 2)
@@ -58,6 +62,8 @@ constructCamera verticalFieldOfView aspectRatio aperture focusDist lookFrom look
         viewportWidth = aspectRatio * viewportHeight
         -- camera local orthonormal basis when camera faces z -> relative camera points at w
         w = getUnitVector (lookFrom - lookAt)
+        -- u,v and viewUp are in one plane
+        -- u,v,w camera relative coordinate space
         u = getUnitVector (crossProduct viewUp w)
         v = crossProduct w u
         horizontal = scalarMultiplication u (viewportWidth * focusDist)

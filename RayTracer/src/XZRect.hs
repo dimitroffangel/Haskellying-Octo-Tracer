@@ -1,4 +1,4 @@
-module XYRect where
+module XZRect where
 
 import AxisAlignedBoundingBox
 import HitRecord
@@ -24,8 +24,8 @@ hitXZRect (XZRect x0 x1 z0 z1 xyRectY xzRectMaterial)
                         else 
                             let 
                                 newU = (intersectedX - x0) / (x1 - x0)
-                                newV = (intersectedY - z0) / (z1 - z0)
+                                newV = (intersectedZ - z0) / (z1 - z0)
                                 newT = t
                                 in Right $ 
-                                    setFaceNormal (HitRecord (getPointLocation ray t) hitRecordNormal xyRectMaterial newU newV newT hitRecordFrontFace)
+                                    setFaceNormal (HitRecord (getPointLocation ray t) hitRecordNormal xzRectMaterial newU newV newT hitRecordFrontFace)
                                     ray $ Vector 0 0 1
